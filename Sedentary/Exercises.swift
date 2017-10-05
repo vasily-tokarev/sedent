@@ -14,7 +14,7 @@ struct Exercise {
     var duration: Int
     var name: String
     var speech: String
-    //    var description: String
+//    var description: String
 }
 
 struct Exercises {

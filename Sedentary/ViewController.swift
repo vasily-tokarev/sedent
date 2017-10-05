@@ -15,6 +15,10 @@ class ViewController: UIViewController {
     @IBOutlet weak var exerciseNotificationSwitch: UISwitch!
     @IBOutlet weak var exerciseTimerLabel: UILabel!
     
+    @IBAction func unwindToView(segue: UIStoryboardSegue) {
+        print("unwinding")
+    }
+    
     @IBAction func startButtonTapped(_ sender: UIButton) {
         if exerciseNotificationSwitch.isOn {
             Exercises(ids: [1, 2]).start()
@@ -56,8 +60,17 @@ class ViewController: UIViewController {
         }
     }
     
+    @objc func tapFunction(sender:UITapGestureRecognizer) {
+        print("tap working")
+        performSegue(withIdentifier: "ViewToTimePicker", sender: nil)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(ViewController.tapFunction))
+        exerciseTimerLabel.isUserInteractionEnabled = true
+        exerciseTimerLabel.addGestureRecognizer(tap)
         
         // if timer started = timer falue else timer default value
         
