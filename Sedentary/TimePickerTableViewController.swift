@@ -19,6 +19,7 @@ import UIKit
 
 struct UserSettings: Codable {
     let notificationInterval: Double
+//    let worksouts
 }
 
 class TimePickerTableViewController: UITableViewController {

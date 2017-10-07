@@ -1,5 +1,5 @@
 //
-//  ExercisesTableViewController.swift
+//  WorkoutsTableViewController.swift
 //  Sedentary
 //
 //  Created by vt on 10/6/17.
@@ -8,13 +8,9 @@
 
 import UIKit
 
-class ExercisesTableViewController: UITableViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    @IBOutlet weak var imageView: UIImageView!
+class WorkoutsTableViewController: UITableViewController {
     var selectedCell: CellType?
-    enum Section: Int {
-        case image = 2
-    }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -34,57 +30,12 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 5
+        return 0
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-//        if section == 4 {
-//            return 3
-//        } else {
-            return 1
-//        }
-    }
-    
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // Image view.
-        if indexPath.section == Section.image.rawValue {
-            let alertController = UIAlertController(title: "Choose Image Source", message: nil, preferredStyle: .actionSheet)
-            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-            alertController.addAction(cancelAction)
-            
-            let imagePicker = UIImagePickerController()
-            imagePicker.delegate = self
-            
-            if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                print("source available")
-                let cameraAction = UIAlertAction(title: "Camera", style: .default, handler: {
-                    action in
-                        imagePicker.sourceType = .camera
-                        self.present(imagePicker, animated: true, completion: nil)
-                })
-                alertController.addAction(cameraAction)
-            }
-            
-            if UIImagePickerController.isSourceTypeAvailable(.photoLibrary) {
-                let photoLibraryAction = UIAlertAction(title: "Photo Library", style: .default, handler: {
-                    action in
-                    imagePicker.sourceType = .photoLibrary
-                    self.present(imagePicker, animated: true, completion: nil)
-                })
-                alertController.addAction(photoLibraryAction)
-            }
-            
-//            alertController.popoverPresentationController?.sourceView = sender
-            present(alertController, animated: true, completion: nil)
-        }
-    }
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        if let selectedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            imageView.image = selectedImage
-            dismiss(animated: true, completion: nil)
-        }
+        return 0
     }
 
     /*
