@@ -8,14 +8,21 @@
 
 import Foundation
 import AVFoundation
+import UIKit
 
 struct Exercise {
     let id: Int
-    var duration: Int
     var name: String
-    var speech: String
-//    5-10 seconds announcement
-//    var description: String
+    var duration: Int
+    var image: UIImage
+    struct Speech {
+        var start: String
+        var speechThirty: String
+        var speechTen: String
+        var speechFive: String
+        var speechLast: String
+    }
+    var description: String
 }
 
 struct WorkoutFunctions {

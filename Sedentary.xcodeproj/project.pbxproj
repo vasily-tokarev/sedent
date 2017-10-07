@@ -120,11 +120,11 @@
 			isa = PBXGroup;
 			children = (
 				775729EB1F83737500D3F83F /* Main.storyboard */,
+				770174FC1F84F541002A988F /* Workout.swift */,
 				77E51E6F1F87D33F00E8FBE6 /* ExercisesTableViewController.swift */,
 				77D78D341F880D5A00A3FCCC /* ExercisesTableViewCell.swift */,
 				77E51E6D1F87D16400E8FBE6 /* WorkoutsTableViewController.swift */,
 				7771C0851F88094D005BAE9A /* WorkoutsTableViewCell.swift */,
-				770174FC1F84F541002A988F /* Workout.swift */,
 				77E51E691F87BC5C00E8FBE6 /* WorkoutsExercisesTableViewCell.swift */,
 				77E51E6A1F87BC5C00E8FBE6 /* WorkoutsExercisesTableViewController.swift */,
 				770175001F864BB0002A988F /* TimePickerTableViewController.swift */,

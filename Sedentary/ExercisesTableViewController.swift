@@ -8,6 +8,37 @@
 
 import UIKit
 
+
+//let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+//let archiveURL = documentsDirectory.appendingPathComponent("user_settings").appendingPathExtension("plist")
+//let propertyListEncoder = PropertyListEncoder()
+//let encodedUserSettings = try? propertyListEncoder.encode(userSettings)
+//
+//try? encodedUserSettings?.write(to: archiveURL, options: .noFileProtection)
+//
+//// reading
+//let propertyListDecoder = PropertyListDecoder()
+//if let retrievedUserSettingsData = try? Data(contentsOf: archiveURL),
+//    let decodedUserSettings = try?
+//        propertyListDecoder.decode(UserSettings.self, from: retrievedUserSettingsData) {
+//    print(decodedUserSettings)
+//}
+
+//struct Exercise {
+//    let id: Int
+//    var name: String
+//    var duration: Int
+//    var image: UIImage
+//    struct Speech {
+//        var start: String
+//        var speechThirty: String
+//        var speechTen: String
+//        var speechFive: String
+//        var speechLast: String
+//    }
+//    var description: String
+//}
+
 class ExercisesTableViewController: UITableViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     @IBOutlet weak var imageView: UIImageView!
     var selectedCell: CellType?
