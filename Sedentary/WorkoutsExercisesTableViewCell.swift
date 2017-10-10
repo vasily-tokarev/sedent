@@ -15,6 +15,10 @@ class WorkoutsExercisesTableViewCell: UITableViewCell {
         nameLabel.text = workout.name
     }
     
+    func update(with exercise: Exercise) {
+        nameLabel.text = exercise.name
+    }
+    
     func update(with text: String) {
         nameLabel.text = text
     }

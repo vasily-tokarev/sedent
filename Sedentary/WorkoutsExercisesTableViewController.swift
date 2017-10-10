@@ -10,9 +10,25 @@ import UIKit
 
 class WorkoutsExercisesTableViewController: UITableViewController {
     var selectedCell: CellType?
+    
+    enum Section: Int {
+        case workouts = 0
+        case exercises = 1
+    }
+    
+    let workoutsSection: Int = Section.workouts.rawValue
+    let exercisesSection: Int = Section.exercises.rawValue
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        exercises = DataManager().savedExercises
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        navigationItem.rightBarButtonItem = editButtonItem
+//        navigationItem.backBarButtonItem
         
         // https://www.ralfebert.de/tutorials/ios-swift-uitableviewcontroller/reorderable-cells/
 //        self.tableView.isEditing = true
@@ -38,7 +54,22 @@ class WorkoutsExercisesTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 2 // + 1
+        var numberOfRows: Int = 0
+        if section == workoutsSection {
+            numberOfRows = workouts.count
+//            if workouts.count > 0 {
+//                numberOfRows = workouts.count + 1
+//            } else {
+//                numberOfRows = 1
+//            }
+        } else if section == exercisesSection {
+            if exercises.count > 0 {
+                numberOfRows = exercises.count + 1
+            } else {
+                numberOfRows = 1
+            }
+        }
+        return numberOfRows
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -63,72 +94,84 @@ class WorkoutsExercisesTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Cell.workoutsExercisesCell.rawValue, for: indexPath) as! WorkoutsExercisesTableViewCell
-        
-        if indexPath.section == 0 {
-            // create a segue to New workout/exercise
-            // add UILabel with 
-            // attach segue to UILabel
-            if indexPath.row == 1 {
-                cell.update(with: "Add workout")
-            } else {
-                // Use data source to count numberOfRows
-                // Distringuish this row.
-                cell.update(with: Workout(ids: [1], name: "Test workout"))
+        print("exercises.count (cellForRowAt): \(exercises.count)")
+        if indexPath.section == workoutsSection {
+            if workouts.count > 0 {
+                cell.update(with: workouts[indexPath.row])
+                cell.showsReorderControl = true
             }
+            
+//            if workouts.count == 0 {
+//                cell.update(with: "New Workout")
+//                cell.showsReorderControl = false
+//            }
+            
+//            if workouts.count > 0 && indexPath.row == workouts.count + 1 {
+//                cell.update(with: "New Workout")
+//                cell.showsReorderControl = false
+//            }
+
         } else {
-            if indexPath.row == 1 {
-                cell.update(with: "Add exercise")
-            } else {
-                cell.update(with: Workout(ids: [1], name: "Exercise 1"))
+            if exercises.count > 0 && indexPath.row <= exercises.count - 1 {
+                print(indexPath.row)
+                cell.update(with: exercises[indexPath.row])
+                cell.showsReorderControl = true
+            }
+            
+            if exercises.count == 0 {
+                cell.update(with: "New Exercise")
+                cell.showsReorderControl = false
+            }
+            
+            if exercises.count > 0 && indexPath.row == exercises.count + 1 {
+                cell.update(with: "New Exercise")
+                cell.showsReorderControl = false
             }
         }
         
 
         return cell
     }
-    
+
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if section == 0 {
+        if section == workoutsSection {
             return "Workouts"
         } else {
             return "Exercises"
         }
     }
 
-    /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         return true
     }
-    */
 
-    /*
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        print("hitting delete")
         if editingStyle == .delete {
             // Delete the row from the data source
+            print("exercises before (delete): \(exercises.count)")
+            exercises.remove(at: indexPath.row)
+            print("exercises after (delete): \(exercises.count)")
+//            DataManager
             tableView.deleteRows(at: [indexPath], with: .fade)
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+        }
     }
-    */
 
-    /*
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
+        workouts.insert(Workout(ids: [1], name: "hello"), at: to.row)
     }
-    */
 
-    /*
     // Override to support conditional rearranging of the table view.
     override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the item to be re-orderable.
         return true
     }
-    */
 
     /*
     // MARK: - Navigation

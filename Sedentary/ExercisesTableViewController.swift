@@ -40,14 +40,43 @@ import UIKit
 //}
 
 class ExercisesTableViewController: UITableViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    @IBOutlet weak var imageView: UIImageView!
     var selectedCell: CellType?
+    
+    @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var nameTextField: UITextField!
+    @IBOutlet weak var durationLabel: UILabel!
+    @IBOutlet weak var durationStepper: UIStepper!
+    
+    @IBOutlet weak var startSpeech: UITextField!
+    @IBOutlet weak var thirtySecondsLeftSpeech: UITextField!
+    @IBOutlet weak var tenSecondsLeftSpeech: UITextField!
+    @IBOutlet weak var fiveSecondsLeftSpeech: UITextField!
+    @IBOutlet weak var endSpeech: UITextField!
+    
+    @IBOutlet weak var saveButton: UIButton!
+    
     enum Section: Int {
         case image = 2
     }
-    
+
+    @IBAction func saveButtonTapped(_ sender: UIButton) {
+        let exerciseId: Int
+        if exercises.count > 0 {
+            exerciseId = exercises.count
+        } else {
+            exerciseId = 0
+        }
+        exercises.append(Exercise(id: exerciseId, name: nameTextField.text))
+
+        print(DataManager(exercises: exercises))
+        print(DataManager().savedExercises)
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 100 // Something close to your average cell height
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -65,16 +94,16 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 5
+        return 6
     }
-
+/**/
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-//        if section == 4 {
-//            return 3
-//        } else {
+        if section == 3 {
+            return 3
+        } else {
             return 1
-//        }
+        }
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
