@@ -21,7 +21,8 @@ class WorkoutsExercisesTableViewController: UITableViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        exercises = DataManager().savedExercises
+        exercises = DataManager().exercises()
+        print("exercises.count (viewWillAppear): \(exercises.count)")
     }
 
     override func viewDidLoad() {
@@ -154,9 +155,11 @@ class WorkoutsExercisesTableViewController: UITableViewController {
             // Delete the row from the data source
             print("exercises before (delete): \(exercises.count)")
             exercises.remove(at: indexPath.row)
+            if DataManager().saveExercises(exercises: exercises) {
+                tableView.deleteRows(at: [indexPath], with: .fade)
+            }
             print("exercises after (delete): \(exercises.count)")
 //            DataManager
-            tableView.deleteRows(at: [indexPath], with: .fade)
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }
@@ -164,7 +167,16 @@ class WorkoutsExercisesTableViewController: UITableViewController {
 
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-        workouts.insert(Workout(ids: [1], name: "hello"), at: to.row)
+        // Set label with next time.
+//        let ids = exercises.filter { $0.id == exercises[fromIndexPath.row].id }.map { $0.id }
+
+        let exercise = exercises.filter { $0.id == exercises[fromIndexPath.row].id }[0]
+        if workouts.count == 0 {
+            workouts.insert(Workout(ids: [exercise.id], name: exercise.name!), at: to.row)
+            print("workouts moveRowAt: \(workouts)")
+        } else {
+            print("workouts == 0 moveRowAt")
+        }
     }
 
     // Override to support conditional rearranging of the table view.

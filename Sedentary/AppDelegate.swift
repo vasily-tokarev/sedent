@@ -20,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let archiveURL = documentsDirectory.appendingPathComponent("exercises").appendingPathExtension("plist")
         
 
-        print(DataManager().savedExercises)
+        print(DataManager().exercises())
         
 //        if let retrievedExercisesData = try? Data(contentsOf: archiveURL),
 //            let decodedExercises = try?

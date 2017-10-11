@@ -68,8 +68,8 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
         }
         exercises.append(Exercise(id: exerciseId, name: nameTextField.text))
 
-        print(DataManager(exercises: exercises))
-        print(DataManager().savedExercises)
+        print(DataManager().saveExercises(exercises: exercises))
+        print(DataManager().exercises())
     }
 
     override func viewDidLoad() {

@@ -13,16 +13,13 @@ import UIKit
 var exercises: [Exercise] = []
 var workouts: [Workout] = []
 
-class DataManager {
-    var savedExercises: [Exercise] = []
-//    let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent("exercises").appendingPathExtension("plist")
+struct DataManager {
     let exercisesURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
             .appendingPathComponent("exercises").appendingPathExtension("plist")
     let propertyListEncoder = PropertyListEncoder()
     let propertyListDecoder = PropertyListDecoder()
     
     func saveExercises(exercises: [Exercise]) -> Bool {
-//        let exercisesURL = documentsDirectory.appendingPathComponent("exercises").appendingPathExtension("plist")
         let encodedExercises = try? propertyListEncoder.encode(exercises)
         if let _ = try? encodedExercises?.write(to: exercisesURL, options: .noFileProtection) {
             return true
@@ -31,9 +28,8 @@ class DataManager {
         }
     }
     
-    func readExercises() -> [Exercise] {
+    func exercises() -> [Exercise] {
         var exercises: [Exercise] = []
-//        let exercisesURL = documentsDirectory.appendingPathComponent("exercises").appendingPathExtension("plist")
         if let retrievedExercisesData = try? Data(contentsOf: exercisesURL),
             let decodedExercises = try?
                 propertyListDecoder.decode(Array<Exercise>.self, from: retrievedExercisesData) {
@@ -42,19 +38,11 @@ class DataManager {
         return exercises
     }
 
-    func removeExercises() -> Bool {
+    func removeAllExercises() -> Bool {
         if let _ = try? FileManager().removeItem(at: exercisesURL) {
             return true
         } else {
             return false
-        }
-    }
-
-    init(exercises: [Exercise]? = nil) {
-        if let exercises = exercises {
-            let _ = saveExercises(exercises: exercises)
-        } else {
-            savedExercises = readExercises()
         }
     }
 }
@@ -90,6 +78,8 @@ struct Exercise: Codable {
             self.end = end
         }
     }
+    // Add `remove` extension which removes both from `exercises` and data (DataManager).
+    // https://stackoverflow.com/questions/24938948/array-extension-to-remove-object-by-value
 }
 
 struct WorkoutFunctions {
@@ -122,7 +112,7 @@ struct Workout {
     let defaultExercises: [Exercise] = [Exercise(id: 1, name: "Surya Namaskar", duration: 6, speech: Exercise.Speech(start: "Surya Namaskar 1 minute"), description: "test"),
                                         Exercise(id: 2, name: "Headstanding", duration: 6, speech: Exercise.Speech(start: "Headstanding 1 minute"), description: "test")]
     
-    init(ids: [Int], name: String) {
+    init(ids: [Int?], name: String) {
         // https://stackoverflow.com/questions/32332985/how-to-use-audio-in-ios-application-with-swift-2
         self.name = name
         for _ in ids {
