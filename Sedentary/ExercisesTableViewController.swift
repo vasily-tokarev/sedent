@@ -61,15 +61,22 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
 
     @IBAction func saveButtonTapped(_ sender: UIButton) {
         let exerciseId: Int
-        if exercises.count > 0 {
-            exerciseId = exercises.count
+        if exercisesManager.exercises.count > 0 {
+            exerciseId = exercisesManager.exercises.count
         } else {
             exerciseId = 0
         }
-        exercises.append(Exercise(id: exerciseId, name: nameTextField.text))
-
-        print(DataManager().saveExercises(exercises: exercises))
-        print(DataManager().exercises())
+        print("saveButtonTapped")
+        print("exerciseId: \(exerciseId)")
+        print("name: \(nameTextField.text)")
+        print("exercises: \(exercisesManager.exercises)")
+        print("newExercise: \(Exercise(id: exerciseId, name: nameTextField.text!, speech: Exercise.Speech(start: "hello")))")
+        exercisesManager.exercises.append(
+                Exercise(id: exerciseId, name: nameTextField.text!, speech: Exercise.Speech(start: "hello"))
+                )
+        print("appended")
+        let _ = exercisesManager.save(data: exercisesManager.exercises)
+        print("exercise saveButtonTapped: \(exercisesManager.exercises)")
     }
 
     override func viewDidLoad() {
@@ -87,7 +94,7 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        // Dispose of any resources that can be recreated.'
     }
 
     // MARK: - Table view data source

@@ -21,8 +21,8 @@ class WorkoutsExercisesTableViewController: UITableViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        exercises = DataManager().exercises()
-        print("exercises.count (viewWillAppear): \(exercises.count)")
+//        exercises = exercisesManager.exercises
+        print("exercises.count (viewWillAppear): \(exercisesManager.exercises.count)")
     }
 
     override func viewDidLoad() {
@@ -57,15 +57,15 @@ class WorkoutsExercisesTableViewController: UITableViewController {
         // #warning Incomplete implementation, return the number of rows
         var numberOfRows: Int = 0
         if section == workoutsSection {
-            numberOfRows = workouts.count
+            numberOfRows = workoutsManager.workouts.count
 //            if workouts.count > 0 {
 //                numberOfRows = workouts.count + 1
 //            } else {
 //                numberOfRows = 1
 //            }
         } else if section == exercisesSection {
-            if exercises.count > 0 {
-                numberOfRows = exercises.count + 1
+            if exercisesManager.exercises.count > 0 {
+                numberOfRows = exercisesManager.exercises.count + 1
             } else {
                 numberOfRows = 1
             }
@@ -95,10 +95,10 @@ class WorkoutsExercisesTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Cell.workoutsExercisesCell.rawValue, for: indexPath) as! WorkoutsExercisesTableViewCell
-        print("exercises.count (cellForRowAt): \(exercises.count)")
+        print("exercises.count (cellForRowAt): \(exercisesManager.exercises.count)")
         if indexPath.section == workoutsSection {
-            if workouts.count > 0 {
-                cell.update(with: workouts[indexPath.row])
+            if workoutsManager.workouts.count > 0 {
+                cell.update(with: workoutsManager.workouts[indexPath.row])
                 cell.showsReorderControl = true
             }
             
@@ -107,24 +107,24 @@ class WorkoutsExercisesTableViewController: UITableViewController {
 //                cell.showsReorderControl = false
 //            }
             
-//            if workouts.count > 0 && indexPath.row == workouts.count + 1 {
-//                cell.update(with: "New Workout")
+            if workoutsManager.workouts.count > 0 {
+                cell.update(with: workoutsManager.workouts[indexPath.row])
 //                cell.showsReorderControl = false
-//            }
+            }
 
         } else {
-            if exercises.count > 0 && indexPath.row <= exercises.count - 1 {
+            if exercisesManager.exercises.count > 0 && indexPath.row <= exercisesManager.exercises.count - 1 {
                 print(indexPath.row)
-                cell.update(with: exercises[indexPath.row])
+                cell.update(with: exercisesManager.exercises[indexPath.row])
                 cell.showsReorderControl = true
             }
             
-            if exercises.count == 0 {
+            if exercisesManager.exercises.count == 0 {
                 cell.update(with: "New Exercise")
                 cell.showsReorderControl = false
             }
             
-            if exercises.count > 0 && indexPath.row == exercises.count + 1 {
+            if exercisesManager.exercises.count > 0 && indexPath.row == exercisesManager.exercises.count + 1 {
                 cell.update(with: "New Exercise")
                 cell.showsReorderControl = false
             }
@@ -153,12 +153,12 @@ class WorkoutsExercisesTableViewController: UITableViewController {
         print("hitting delete")
         if editingStyle == .delete {
             // Delete the row from the data source
-            print("exercises before (delete): \(exercises.count)")
-            exercises.remove(at: indexPath.row)
-            if DataManager().saveExercises(exercises: exercises) {
+            print("exercises before (delete): \(exercisesManager.exercises.count)")
+            exercisesManager.exercises.remove(at: indexPath.row)
+            if exercisesManager.save(data: exercisesManager.exercises) {
                 tableView.deleteRows(at: [indexPath], with: .fade)
             }
-            print("exercises after (delete): \(exercises.count)")
+            print("exercises after (delete): \(exercisesManager.exercises.count)")
 //            DataManager
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
@@ -170,10 +170,11 @@ class WorkoutsExercisesTableViewController: UITableViewController {
         // Set label with next time.
 //        let ids = exercises.filter { $0.id == exercises[fromIndexPath.row].id }.map { $0.id }
 
-        let exercise = exercises.filter { $0.id == exercises[fromIndexPath.row].id }[0]
-        if workouts.count == 0 {
-            workouts.insert(Workout(ids: [exercise.id], name: exercise.name!), at: to.row)
-            print("workouts moveRowAt: \(workouts)")
+        let exercise = exercisesManager.exercises.filter { $0.id == exercisesManager.exercises[fromIndexPath.row].id }[0]
+        if workoutsManager.workouts.count == 0 {
+            workoutsManager.workouts.insert(Workout(exercises: exercisesManager.exercises, name: exercise.name!), at: to.row)
+            workoutsManager.save(data: workoutsManager.workouts)
+            print("workouts moveRowAt: \(workoutsManager.workouts)")
         } else {
             print("workouts == 0 moveRowAt")
         }

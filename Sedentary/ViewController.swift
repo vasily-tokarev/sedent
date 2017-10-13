@@ -21,8 +21,7 @@ class ViewController: UIViewController {
     
     @IBAction func startButtonTapped(_ sender: UIButton) {
         if exerciseNotificationSwitch.isOn {
-            Workout(ids: [1, 2], name: "My workout").start()
-            // Fetch current exercise.
+            workoutsManager.start() // and re-arrange
         }
     }
     

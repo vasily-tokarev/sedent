@@ -15,12 +15,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        let propertyListDecoder = PropertyListDecoder()
-        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let archiveURL = documentsDirectory.appendingPathComponent("exercises").appendingPathExtension("plist")
+//        let propertyListDecoder = PropertyListDecoder()
+//        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+//        let archiveURL = documentsDirectory.appendingPathComponent("exercises").appendingPathExtension("plist")
         
 
-        print(DataManager().exercises())
+//        print(ExercisesManager().exercises())
         
 //        if let retrievedExercisesData = try? Data(contentsOf: archiveURL),
 //            let decodedExercises = try?
