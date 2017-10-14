@@ -29,8 +29,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //            exercises = decodedExercises
 //            print(exercises)
 //        }
-        
+
+//    print(exercises.dataURL)
+//    Manageable().dataURL(for: Exercise(id: 1))
         // Override point for customization after application launch.
+        print(exercises.saved[0].name)
+        print(exercisesManager.exercises[0].name)
         return true
     }
 

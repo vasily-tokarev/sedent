@@ -10,11 +10,15 @@ import Foundation
 import AVFoundation
 import UIKit
 
-//var exercises: [Exercise] = []
+var exercises: [Exercise] = []
 //var workouts: [Workout] = []
 var exercisesManager = ExercisesManager()
 //var exercises = exercisesManager.exercises
 var workoutsManager = WorkoutsManager()
+
+
+let propertyListEncoder = PropertyListEncoder()
+let propertyListDecoder = PropertyListDecoder()
 
 class DataManager {
     let propertyListEncoder = PropertyListEncoder()
@@ -202,7 +206,8 @@ class WorkoutsManager: DataManager {
     }
 }
 
-struct Exercise: Codable {
+class Exercise: Codable {
+    let savePath: String = "exercises"
     let id: Int?
     var name: String? = "hello"
     var duration: Int = 60
@@ -242,6 +247,50 @@ struct Exercise: Codable {
     // https://stackoverflow.com/questions/24938948/array-extension-to-remove-object-by-value
 }
 
+struct Manageable<Element> {
+    func saved() -> [Element] {
+        var pathString: String?
+        switch Element.self {
+            case is Exercise.Type: pathString = "exercises"
+            case is Workout.Type: pathString = "workouts"
+            default: print("No such type")
+        }
+        var data: [Element] = []
+        let dataURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+                .appendingPathComponent(pathString!).appendingPathExtension("plist")
+        if let retrievedExercisesData = try? Data(contentsOf: dataURL),
+           let decodedExercises = try?
+           propertyListDecoder.decode([Element].self, from: retrievedExercisesData) {
+            data = decodedExercises
+        }
+        return data
+    }
+}
+
+extension Array where Element: Exercise {
+    var manager: Manageable<Exercise> { return Manageable() }
+    var saved: [Exercise] { return manager.saved() }
+}
+
+extension Array where Element: Workout {
+
+}
+
+// We need to save new exercise and update `exercises` variable.
+
+//extension Array: Exercise {
+//    func save(data: [Exercise]) -> Bool {
+//        print("saving ExerciseManager")
+//        let encodedData = try? propertyListEncoder.encode(data)
+//        if let _ = try? encodedData?.write(to: dataURL, options: .noFileProtection) {
+//            exercises = data
+//            return true
+//        } else {
+//            return false
+//        }
+//    }
+//}
+
 struct WorkoutFunctions {
     let speechSynthesizer: AVSpeechSynthesizer = AVSpeechSynthesizer()
 
@@ -259,7 +308,7 @@ struct WorkoutFunctions {
     }
 }
 
-struct Workout: Codable {
+class Workout: Codable {
 //    let workoutFunctions: WorkoutFunctions = WorkoutFunctions()
     let name: String
 //    var timeAt: Date
