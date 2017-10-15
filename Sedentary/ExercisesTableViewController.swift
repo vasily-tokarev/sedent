@@ -34,7 +34,10 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
             exerciseId = 0
         }
         exercises.append(Exercise(id: exerciseId, name: nameTextField.text!, speech: Exercise.Speech(start: "hello")))
-        let _ = exercises.save()
+        if exercises.save() {
+            print("going back from ExerciseTableViewController")
+//            dismiss(animated: true, completion: nil)
+        }
     }
 
     override func viewDidLoad() {

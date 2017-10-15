@@ -11,7 +11,7 @@ import AVFoundation
 import UIKit
 
 var exercises: [Exercise] = DataManager().saved()
-var workouts: [Workout] = []
+var workouts: [Workout] = DataManager().saved()
 let workoutsManager: WorkoutsManager = WorkoutsManager()
 
 
@@ -174,9 +174,8 @@ extension Array where Element: Workout {
             // New workout with exercises with total duration less than settings duration.
             var durationLeft = SettingsManager().workoutDuration
             exercises = exercises.flatMap { exercise in
-                durationLeft -= exercise.duration
-                // Total duration might be more, restrict it somehow.
-                if durationLeft > 0 {
+                if exercise.duration >= durationLeft {
+                    durationLeft -= exercise.duration
                     return exercise
                 } else {
                     return nil
