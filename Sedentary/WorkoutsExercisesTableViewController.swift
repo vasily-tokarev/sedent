@@ -141,24 +141,34 @@ class WorkoutsExercisesTableViewController: UITableViewController {
 
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-        // Set label with next time.
 //        let ids = exercises.filter { $0.id == exercises[fromIndexPath.row].id }.map { $0.id }
+        let fromExercisesToWorkouts = fromIndexPath.section == exercisesSection && to.section == workoutsSection
+        let fromExercisesToExercises = fromIndexPath.section == exercisesSection && to.section == exercisesSection
+        let fromWorkoutsToExercises = fromIndexPath.section == workoutsSection && to.section == exercisesSection
+        let fromWorkoutsToWorkouts = fromIndexPath.section == workoutsSection && to.section == workoutsSection
 
-        if fromIndexPath.section == exercisesSection {
-            // REMOVE workouts if no exercises (in arrange()?).
-            // Save reordered exercises.
-            let exercise = exercises.filter { $0.id == exercises[fromIndexPath.row].id }[0]
-            if workouts.count == 0 {
+        switch true {
+            case fromExercisesToWorkouts:
+                let exercise = exercises.filter { $0.id == exercises[fromIndexPath.row].id }[0]
                 workouts.insert(Workout(exercises: exercises, name: exercise.name!), at: to.row)
                 let _ = workouts.save()
-                print("saving workouts")
-            } else {
-            }
-//            tableView.reloadData()
-        } else {
-            print("moving from workouts section")
+                print("from exercises to workouts")
+            case fromExercisesToExercises:
+                let movedExercise = exercises[fromIndexPath.row]
+                exercises.remove(at: fromIndexPath.row)
+                exercises.insert(movedExercise, at: to.row)
+                exercises.save()
+                print("from exercises to exercises")
+            case fromWorkoutsToWorkouts:
+                print("do nothing yet")
+            case fromWorkoutsToExercises:
+                print("fromWorkoutsToExercises")
+                // Remove workouts[fromIndexPath.row]
+            default:
+                print("default")
         }
 
+        tableView.reloadData() // Remove it after arrange() is implemented.
     }
 
     // Override to support conditional rearranging of the table view.
