@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ExercisesTableViewController: UITableViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class ExercisesTableViewController: UITableViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
     var selectedCell: Navigation.WorkoutsExercisesTableViewController.Cell?
     
     let imageSection: Int = Navigation.ExercisesTableViewController.Section.image.number
@@ -18,11 +18,13 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
     @IBOutlet weak var durationLabel: UILabel!
     @IBOutlet weak var durationStepper: UIStepper!
     
-    @IBOutlet weak var startSpeech: UITextField!
-    @IBOutlet weak var thirtySecondsLeftSpeech: UITextField!
-    @IBOutlet weak var tenSecondsLeftSpeech: UITextField!
-    @IBOutlet weak var fiveSecondsLeftSpeech: UITextField!
-    @IBOutlet weak var endSpeech: UITextField!
+    @IBOutlet weak var startSpeechTextField: UITextField!
+    @IBOutlet weak var thirtySecondsLeftSpeechTextField: UITextField!
+    @IBOutlet weak var tenSecondsLeftSpeechTextField: UITextField!
+    @IBOutlet weak var fiveSecondsLeftSpeechTextField: UITextField!
+    @IBOutlet weak var endSpeechTextField: UITextField!
+    // TODO: Hide keyboard. Return is not going to work.
+    @IBOutlet weak var descriptionTextView: UITextView!
     
     @IBOutlet weak var saveButton: UIButton!
 
@@ -35,13 +37,26 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
         }
         exercises.append(Exercise(id: exerciseId, name: nameTextField.text!, speech: Exercise.Speech(start: "hello")))
         if exercises.save() {
-            print("going back from ExerciseTableViewController")
-//            dismiss(animated: true, completion: nil)
+            print("going back from ExerciseTableViewController") // This will not execute, will it?
         }
+    }
+
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        // TODO: Refactor.
+        nameTextField.delegate = self
+        startSpeechTextField.delegate = self
+        thirtySecondsLeftSpeechTextField.delegate = self
+        tenSecondsLeftSpeechTextField.delegate = self
+        fiveSecondsLeftSpeechTextField.delegate = self
+        endSpeechTextField.delegate = self
+//        descriptionTextView.delegate = self
         
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 100 // Something close to your average cell height

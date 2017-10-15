@@ -100,17 +100,29 @@
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Workout placeholder" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="s5X-FL-xNc">
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Cell placeholder" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="s5X-FL-xNc">
                                             <rect key="frame" x="8" y="11" width="159" height="21"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="12:30" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mvH-yF-Vht">
+                                            <rect key="frame" x="277" y="16" width="43" height="11.5"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstItem="mvH-yF-Vht" firstAttribute="top" secondItem="n1j-Ab-70J" secondAttribute="topMargin" constant="8" id="Beo-bD-eT0"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="mvH-yF-Vht" secondAttribute="bottom" constant="8" id="IXH-pz-i1w"/>
+                                        <constraint firstItem="mvH-yF-Vht" firstAttribute="trailing" secondItem="n1j-Ab-70J" secondAttribute="trailingMargin" constant="8" id="zRz-gx-ReY"/>
+                                    </constraints>
                                 </tableViewCellContentView>
                                 <connections>
                                     <outlet property="nameLabel" destination="s5X-FL-xNc" id="qWI-92-HBG"/>
+                                    <outlet property="workoutTimeLabel" destination="mvH-yF-Vht" id="N2M-WP-ubL"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -384,16 +396,17 @@
                         </connections>
                     </tableView>
                     <connections>
+                        <outlet property="descriptionTextView" destination="8EZ-2K-Prk" id="rp2-BA-Jit"/>
                         <outlet property="durationLabel" destination="1zF-kR-cMo" id="KnN-Bs-yjN"/>
                         <outlet property="durationStepper" destination="bKK-af-xJd" id="leK-tO-MnX"/>
-                        <outlet property="endSpeech" destination="2A3-Qr-4WQ" id="cE2-5G-ESv"/>
-                        <outlet property="fiveSecondsLeftSpeech" destination="cGY-Ry-d39" id="MFa-eJ-4Px"/>
+                        <outlet property="endSpeechTextField" destination="2A3-Qr-4WQ" id="2ei-Jz-m8t"/>
+                        <outlet property="fiveSecondsLeftSpeechTextField" destination="cGY-Ry-d39" id="MG2-0n-2Us"/>
                         <outlet property="imageView" destination="IYs-xn-EaU" id="gqP-zT-CVV"/>
                         <outlet property="nameTextField" destination="XSW-v7-ZUK" id="ehe-H9-kbv"/>
                         <outlet property="saveButton" destination="Y91-OA-NE2" id="TUV-0s-MXZ"/>
-                        <outlet property="startSpeech" destination="jjl-kX-z0W" id="ekb-bl-vc1"/>
-                        <outlet property="tenSecondsLeftSpeech" destination="Ynp-qp-Zvs" id="PN8-EN-wC5"/>
-                        <outlet property="thirtySecondsLeftSpeech" destination="4W9-wp-f3G" id="T7B-12-iyB"/>
+                        <outlet property="startSpeechTextField" destination="jjl-kX-z0W" id="GPJ-XK-YlY"/>
+                        <outlet property="tenSecondsLeftSpeechTextField" destination="Ynp-qp-Zvs" id="rnJ-3N-25X"/>
+                        <outlet property="thirtySecondsLeftSpeechTextField" destination="4W9-wp-f3G" id="4Kf-GP-HK9"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="f4W-Lj-Dgq" userLabel="First Responder" sceneMemberID="firstResponder"/>

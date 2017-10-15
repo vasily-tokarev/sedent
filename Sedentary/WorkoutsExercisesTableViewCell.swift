@@ -10,6 +10,7 @@ import UIKit
 
 class WorkoutsExercisesTableViewCell: UITableViewCell {
     @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet weak var workoutTimeLabel: UILabel!
     
     func update(with workout: Workout) {
         nameLabel.text = workout.name
@@ -17,10 +18,12 @@ class WorkoutsExercisesTableViewCell: UITableViewCell {
     
     func update(with exercise: Exercise) {
         nameLabel.text = exercise.name
+        workoutTimeLabel.isHidden = true
     }
     
     func update(with text: String) {
         nameLabel.text = text
+        workoutTimeLabel.isHidden = true
     }
 
     override func awakeFromNib() {
