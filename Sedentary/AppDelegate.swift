@@ -15,26 +15,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-//        let propertyListDecoder = PropertyListDecoder()
-//        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-//        let archiveURL = documentsDirectory.appendingPathComponent("exercises").appendingPathExtension("plist")
-        
-
-//        print(ExercisesManager().exercises())
-        
-//        if let retrievedExercisesData = try? Data(contentsOf: archiveURL),
-//            let decodedExercises = try?
-//                propertyListDecoder.decode(Array<Exercise>.self, from: retrievedExercisesData) {
-//            print(decodedExercises)
-//            exercises = decodedExercises
-//            print(exercises)
-//        }
-
-//    print(exercises.dataURL)
-//    Manageable().dataURL(for: Exercise(id: 1))
         // Override point for customization after application launch.
-        print(exercises.saved[0].name)
-        print(exercisesManager.exercises[0].name)
+//        exercises.saved.forEach { exercise in print(exercise.name) }
         return true
     }
 

@@ -120,41 +120,12 @@
                         </connections>
                     </tableView>
                     <connections>
-                        <segue destination="6oh-2W-1XK" kind="show" identifier="WorksoutsExercisesToExercises" id="8zI-3F-Odm"/>
-                        <segue destination="eys-a7-hZL" kind="show" identifier="WorksoutsExercisesToWorkouts" id="JL9-hl-s2d"/>
+                        <segue destination="6oh-2W-1XK" kind="show" identifier="WorkoutsExercisesToExercises" id="8zI-3F-Odm"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mSm-3Q-j2O" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2085" y="115"/>
-        </scene>
-        <!--Workouts Table View Controller-->
-        <scene sceneID="oF2-xl-hrn">
-            <objects>
-                <tableViewController id="eys-a7-hZL" customClass="WorkoutsTableViewController" customModule="Sedentary" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="Wl5-h8-WiF">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="ZL7-4e-jzM">
-                                <rect key="frame" x="0.0" y="28" width="320" height="44"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ZL7-4e-jzM" id="YK2-Fj-3o2">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </tableViewCellContentView>
-                            </tableViewCell>
-                        </prototypes>
-                        <connections>
-                            <outlet property="dataSource" destination="eys-a7-hZL" id="AeU-dt-Xn6"/>
-                            <outlet property="delegate" destination="eys-a7-hZL" id="L4K-4v-Nm6"/>
-                        </connections>
-                    </tableView>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="9O7-iW-SAp" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2916" y="-196"/>
         </scene>
         <!--Exercises Table View Controller-->
         <scene sceneID="d3Q-2E-2tW">
@@ -426,7 +397,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="f4W-Lj-Dgq" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2915.625" y="493.75"/>
+            <point key="canvasLocation" x="2910" y="115"/>
         </scene>
         <!--Exercise View Controller-->
         <scene sceneID="12g-wU-WIr">
@@ -625,7 +596,6 @@
         <!--Navigation Controller-->
         <scene sceneID="V5d-X3-1kv">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="tZl-Ez-Y9Q" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="98L-hA-IiT" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="7VG-DY-eUr">
@@ -637,6 +607,7 @@
                         <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="J99-SI-IVu"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="tZl-Ez-Y9Q" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="467" y="115"/>
         </scene>

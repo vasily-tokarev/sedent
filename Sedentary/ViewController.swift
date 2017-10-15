@@ -22,6 +22,7 @@ class ViewController: UIViewController {
     @IBAction func startButtonTapped(_ sender: UIButton) {
         if exerciseNotificationSwitch.isOn {
             workoutsManager.start() // and re-arrange
+//            UNUserNotificationCenter.current().removeAllPendingNotificat‌​ionRequests() // TODO: Dismiss notification after start.
         }
     }
     
@@ -73,7 +74,7 @@ class ViewController: UIViewController {
         exerciseTimerLabel.isUserInteractionEnabled = true
         exerciseTimerLabel.addGestureRecognizer(tap)
         
-        // if timer started = timer falue else timer default value
+        // if timer started = timer false else timer default value
         
         // Do any additional setup after loading the view, typically from a nib.
     }

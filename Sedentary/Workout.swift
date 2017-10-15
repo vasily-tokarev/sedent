@@ -10,148 +10,22 @@ import Foundation
 import AVFoundation
 import UIKit
 
-var exercises: [Exercise] = []
-//var workouts: [Workout] = []
-var exercisesManager = ExercisesManager()
-//var exercises = exercisesManager.exercises
-var workoutsManager = WorkoutsManager()
+var exercises: [Exercise] = DataManager().saved()
+var workouts: [Workout] = []
+let workoutsManager: WorkoutsManager = WorkoutsManager()
 
 
-let propertyListEncoder = PropertyListEncoder()
-let propertyListDecoder = PropertyListDecoder()
-
-class DataManager {
-    let propertyListEncoder = PropertyListEncoder()
-    let propertyListDecoder = PropertyListDecoder()
-
-//    func dataURL() -> URL {
-    // Implement in subclass.
-//    }
-
-
-}
-
-// MAKE IT RIGHT! Protocols? Aliases? Extensions?
-// Make it simple? Just use [Exercise] variable and functions.
-
-class SettingsManager: DataManager {
+class SettingsManager {
     let notificationInterval: Int = 120
     let workoutDuration: Int = 2 // or seconds?
     let timerOffAt: Date = Date()
 }
 
-class ExercisesManager: DataManager {
-    let dataURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-            .appendingPathComponent("exercises").appendingPathExtension("plist")
-    var exercises: [Exercise] = []
-
-    func data() -> [Exercise] {
-        var data: [Exercise] = []
-        if let retrievedExercisesData = try? Data(contentsOf: dataURL),
-           let decodedExercises = try?
-           propertyListDecoder.decode(Array<Exercise>.self, from: retrievedExercisesData) {
-            data = decodedExercises
-        }
-        exercises = data
-        return exercises
-    }
-
-    func save(data: [Exercise]) -> Bool {
-        print("saving ExerciseManager")
-        let encodedData = try? propertyListEncoder.encode(data)
-        if let _ = try? encodedData?.write(to: dataURL, options: .noFileProtection) {
-            exercises = data
-            return true
-        } else {
-            return false
-        }
-    }
-
-    func removeAll() -> Bool {
-        if let _ = try? FileManager().removeItem(at: dataURL) {
-            return true
-        } else {
-            return false
-        }
-    }
-
-    override init() {
-        super.init()
-        var data: [Exercise] = []
-        if let retrievedExercisesData = try? Data(contentsOf: dataURL),
-           let decodedExercises = try?
-           propertyListDecoder.decode(Array<Exercise>.self, from: retrievedExercisesData) {
-            data = decodedExercises
-        }
-        exercises = data
-//        exercises = data()
-    }
-}
-
-class WorkoutsManager: DataManager {
+// I'll name you Coach!
+class WorkoutsManager {
     let speechSynthesizer: AVSpeechSynthesizer = AVSpeechSynthesizer()
-    let dataURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-            .appendingPathComponent("workout").appendingPathExtension("plist")
     var workouts: [Workout] = []
     var exercises: [Exercise] = []
-
-    func data() -> [Workout] {
-        var data: [Workout] = []
-        if let retrievedExercisesData = try? Data(contentsOf: dataURL),
-           let decodedExercises = try?
-           propertyListDecoder.decode(Array<Workout>.self, from: retrievedExercisesData) {
-            data = decodedExercises
-        }
-        workouts = data
-        return workouts
-    }
-
-    func save(data: [Workout]) -> Bool {
-        let encodedData = try? propertyListEncoder.encode(data)
-        if let _ = try? encodedData?.write(to: dataURL, options: .noFileProtection) {
-            workouts = data
-            return true
-        } else {
-            return false
-        }
-    }
-
-    func removeAll() -> Bool {
-        if let _ = try? FileManager().removeItem(at: dataURL) {
-            return true
-        } else {
-            return false
-        }
-    }
-
-    func arrange() {
-        // Returns arranged workouts with timeAt and exercises.
-        // Exercises in input order with duration less than workout duration.
-        //
-
-        if workouts.count == 0 {
-            // New workout with exercises with total duration less than settings duration.
-            var durationLeft = SettingsManager().workoutDuration
-            exercises = exercises.flatMap { exercise in
-                durationLeft -= exercise.duration
-                // Total duration might be more, restrict it somehow.
-                if durationLeft > 0 {
-                    return exercise
-                } else {
-                    return nil
-                }
-            }
-            workouts.append(Workout(exercises: exercises, name: "Test"))
-            let _ = save(data: workouts)
-        }
-
-//        if workouts.count > 0 && workouts.last!.timeAt < SettingsManager().timerOffAt {
-//            exercises = exercises.reduce(SettingsManager().workoutDuration, { duration, exercise in
-//                return duration - exercise.duration!
-//            })
-//        }
-    }
-
 
     func dispatchSpeaker(say speech: String, seconds: Int = 0) {
         let speech = AVSpeechUtterance(string: speech)
@@ -167,22 +41,12 @@ class WorkoutsManager: DataManager {
     }
 
     func start() {
-        print("workout started start()")
         let workout = workouts.first
-        print("workout: \(workout)")
-        print("exercises: \(exercises)")
-        exercises = exercisesManager.exercises
         let lastExerciseId = exercises.last!.id
-        print("1")
         _ = exercises.reduce(0, { duration, exercise in
-            print("2")
             dispatchSpeaker(say: exercise.speech!.start!, seconds: duration) // 0, 6
 //            dispatchSpeaker(say: exercise.speech!.start!, seconds: duration) // 0, 6
-            print("3")
-            print("exercise.duration: \(exercise.duration)")
-
             dispatchSpeaker(say: "30 seconds left", seconds: (exercise.duration - (exercise.duration / (exercise.duration / workout!.reminder))) + duration)
-            print("4")
             if exercise.id == lastExerciseId {
                 dispatchSpeaker(say: "Back to work", seconds: duration + exercise.duration)
                 // Restart timer in MainTableViewController
@@ -190,19 +54,6 @@ class WorkoutsManager: DataManager {
             return duration + exercise.duration
         })
         // delay
-    }
-
-    override init() {
-//        workouts = data()
-        super.init()
-        var data: [Workout] = []
-        if let retrievedExercisesData = try? Data(contentsOf: dataURL),
-           let decodedExercises = try?
-           propertyListDecoder.decode(Array<Workout>.self, from: retrievedExercisesData) {
-            data = decodedExercises
-        }
-        workouts = data
-        exercises = exercisesManager.exercises
     }
 }
 
@@ -247,49 +98,101 @@ class Exercise: Codable {
     // https://stackoverflow.com/questions/24938948/array-extension-to-remove-object-by-value
 }
 
-struct Manageable<Element> {
-    func saved() -> [Element] {
+struct DataManager<Element> {
+    // Constraint types with a protocol?
+    let propertyListEncoder = PropertyListEncoder()
+    let propertyListDecoder = PropertyListDecoder()
+
+    var dataURL: URL {
         var pathString: String?
         switch Element.self {
-            case is Exercise.Type: pathString = "exercises"
-            case is Workout.Type: pathString = "workouts"
-            default: print("No such type")
+        case is Exercise.Type: pathString = "exercises"
+        case is Workout.Type: pathString = "workouts"
+        default: print("No such type")
         }
-        var data: [Element] = []
-        let dataURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
                 .appendingPathComponent(pathString!).appendingPathExtension("plist")
+    }
+
+    func saved() -> [Element] {
+        var data: [Element] = []
         if let retrievedExercisesData = try? Data(contentsOf: dataURL),
-           let decodedExercises = try?
+           let decodedData = try?
            propertyListDecoder.decode([Element].self, from: retrievedExercisesData) {
-            data = decodedExercises
+            data = decodedData
         }
         return data
+    }
+
+    func save(data: [Element]) -> Bool {
+        let encodedData = try? propertyListEncoder.encode(data)
+        if let _ = try? encodedData?.write(to: dataURL, options: .noFileProtection) {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    func removeAll() -> Bool {
+        if let _ = try? FileManager().removeItem(at: dataURL) {
+            return true
+        } else {
+            return false
+        }
     }
 }
 
 extension Array where Element: Exercise {
-    var manager: Manageable<Exercise> { return Manageable() }
-    var saved: [Exercise] { return manager.saved() }
+    private var manager: DataManager<Exercise> { return DataManager() }
+    var saved: [Exercise] {
+        exercises = manager.saved()
+        return exercises
+    }
+    func save() -> Bool {
+        exercises = self
+        return manager.save(data: self)
+    }
 }
 
 extension Array where Element: Workout {
+    private var manager: DataManager<Workout> { return DataManager() }
+    var saved: [Workout] {
+        workouts = manager.saved()
+        return workouts
+    }
+    func save() -> Bool {
+        workouts = self
+        return manager.save(data: self)
+    }
 
-}
+    func arrange() {
+        // Returns arranged workouts with timeAt and exercises.
+        // Exercises in input order with duration less than workout duration.
+        //
 
-// We need to save new exercise and update `exercises` variable.
+        if workouts.count == 0 {
+            // New workout with exercises with total duration less than settings duration.
+            var durationLeft = SettingsManager().workoutDuration
+            exercises = exercises.flatMap { exercise in
+                durationLeft -= exercise.duration
+                // Total duration might be more, restrict it somehow.
+                if durationLeft > 0 {
+                    return exercise
+                } else {
+                    return nil
+                }
+            }
+            workouts.append(Workout(exercises: exercises, name: "Test"))
+//            let _ = save(data: workouts)
+        }
 
-//extension Array: Exercise {
-//    func save(data: [Exercise]) -> Bool {
-//        print("saving ExerciseManager")
-//        let encodedData = try? propertyListEncoder.encode(data)
-//        if let _ = try? encodedData?.write(to: dataURL, options: .noFileProtection) {
-//            exercises = data
-//            return true
-//        } else {
-//            return false
+//        if workouts.count > 0 && workouts.last!.timeAt < SettingsManager().timerOffAt {
+//            exercises = exercises.reduce(SettingsManager().workoutDuration, { duration, exercise in
+//                return duration - exercise.duration!
+//            })
 //        }
-//    }
-//}
+    }
+}
 
 struct WorkoutFunctions {
     let speechSynthesizer: AVSpeechSynthesizer = AVSpeechSynthesizer()
@@ -325,19 +228,6 @@ class Workout: Codable {
     }
 
     func start() {
-//        let lastExerciseId = exercises.last!.id
-//        _ = exercises.reduce(0, { duration, exercise in
-//            workoutFunctions.dispatchSpeaker(say: exercise.speech!.start!, seconds: duration) // 0, 6
-//            print("exercise.duration: \(exercise.duration)")
-//
-//            workoutFunctions.dispatchSpeaker(say: "30 seconds left", seconds: (exercise.duration - (exercise.duration / (exercise.duration / reminder))) + duration)
-//            if exercise.id == lastExerciseId {
-//                workoutFunctions.dispatchSpeaker(say: "Back to work", seconds: duration + exercise.duration)
-//                // Restart timer in MainTableViewController
-//            }
-//            return duration + exercise.duration
-//        })
-        // delay
     }
 }
 
