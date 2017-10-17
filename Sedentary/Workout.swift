@@ -12,12 +12,13 @@ import UIKit
 
 var exercises: [Exercise] = DataManager().saved()
 var workouts: [Workout] = DataManager().saved()
+var enabledExercises: [EnabledExercise] = DataManager().saved()
 let workoutsManager: WorkoutsManager = WorkoutsManager()
 
 
 class SettingsManager {
     let notificationInterval: Int = 120
-    let workoutDuration: Int = 2 // or seconds?
+    let workoutDuration: Int = 120 // or seconds?
     let timerOffAt: Date = Date()
 }
 
@@ -108,7 +109,8 @@ struct DataManager<Element> {
         switch Element.self {
         case is Exercise.Type: pathString = "exercises"
         case is Workout.Type: pathString = "workouts"
-        default: print("No such type")
+        case is EnabledExercise.Type: pathString = "enabledExercises"
+        default: print("DataManager: No such type.")
         }
         return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
                 .appendingPathComponent(pathString!).appendingPathExtension("plist")
@@ -144,53 +146,197 @@ struct DataManager<Element> {
 
 extension Array where Element: Exercise {
     private var manager: DataManager<Exercise> { return DataManager() }
+
     var saved: [Exercise] {
         exercises = manager.saved()
         return exercises
     }
+
     func save() -> Bool {
         exercises = self
         return manager.save(data: self)
     }
 }
 
+extension Array where Element: EnabledExercise {
+    private var manager: DataManager<EnabledExercise> { return DataManager() }
+
+    var saved: [EnabledExercise] {
+        enabledExercises = manager.saved()
+        return enabledExercises
+    }
+
+    func save() -> Bool {
+        enabledExercises = self
+        return manager.save(data: self)
+    }
+}
+
+typealias SortedExercisesTuple = (exercisesUsed: [EnabledExercise], exercisesLeft: [EnabledExercise])
+
 extension Array where Element: Workout {
     private var manager: DataManager<Workout> { return DataManager() }
+
     var saved: [Workout] {
         workouts = manager.saved()
         return workouts
     }
+
     func save() -> Bool {
         workouts = self
         return manager.save(data: self)
     }
 
-    func arrange() {
-        // Returns arranged workouts with timeAt and exercises.
-        // Exercises in input order with duration less than workout duration.
-        //
+    func arrange(exercises: SortedExercisesTuple) {
+        var duration = SettingsManager().workoutDuration
 
-        if workouts.count == 0 {
-            // New workout with exercises with total duration less than settings duration.
-            var durationLeft = SettingsManager().workoutDuration
-            exercises = exercises.flatMap { exercise in
-                if exercise.duration >= durationLeft {
-                    durationLeft -= exercise.duration
-                    return exercise
+        func sortExercises(exercises: SortedExercisesTuple) -> SortedExercisesTuple {
+            var sortedExercises: SortedExercisesTuple = (exercisesUsed: [], exercisesLeft: [])
+            exercises.exercisesLeft.forEach({ exercise in
+                duration -= exercise.duration
+                if duration >= 0 {
+                    sortedExercises.exercisesUsed.append(exercise)
                 } else {
-                    return nil
+                    sortedExercises.exercisesLeft.append(exercise)
                 }
-            }
-            workouts.append(Workout(exercises: exercises, name: "Test"))
-//            let _ = save(data: workouts)
+            })
+            return sortedExercises
         }
 
-//        if workouts.count > 0 && workouts.last!.timeAt < SettingsManager().timerOffAt {
-//            exercises = exercises.reduce(SettingsManager().workoutDuration, { duration, exercise in
-//                return duration - exercise.duration!
-//            })
-//        }
+        let sortedExercises = sortExercises(exercises: (exercisesUsed: [], exercisesLeft: exercises.exercisesLeft))
+        workouts.append(Workout(next: true, exercises: sortedExercises.exercisesUsed))
+        if sortedExercises.exercisesLeft.count > 0 {
+            workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: sortedExercises.exercisesLeft))
+        }
     }
+
+//    func arrange() {
+//        print("arranging workouts")
+//        func newWorkout() -> Workout {
+//            var durationLeft = SettingsManager().workoutDuration
+//            let exercisesForWorkout: [EnabledExercise] = enabledExercises.flatMap { exercise in
+////                let exercise = exercises.filter { $0.id == enabledExercise.id }[0]
+//                if exercise.duration <= durationLeft {
+//                    durationLeft -= exercise.duration
+//                    return exercise
+//                } else {
+//                    return nil
+//                }
+//            }
+//            return Workout(next: true, exercises: exercisesForWorkout) // next?
+//        }
+//
+//        if workouts.count > 0 {
+//            print("workouts.count > 0")
+//            print("workouts.count: \(workouts.count)")
+//            print("workouts.last!.exercises: \(workouts.last!.enabledExercises)")
+//            print("workouts.last!.exercises.count: \(workouts.last!.enabledExercises!.count)")
+//            print("lastEnabledExercise 0: \(workouts.last!.enabledExercises!.last!)")
+//            let lastEnabledExercise = workouts.last!.enabledExercises!.last!
+//            print("lastEnabledExercise 1: \(lastEnabledExercise)")
+//            let lastEnabledExerciseIndex = enabledExercises.index(where: {$0.id == lastEnabledExercise.id})
+//            print("lastEnabledExerciseIndex: \(lastEnabledExerciseIndex)")
+//            var exercisesLeftDuration: Int = 0
+//            let exercisesLeft: [EnabledExercise] = enabledExercises.enumerated().flatMap { index, exercise in
+//                print("exerciseLeft started")
+//                guard lastEnabledExerciseIndex! < enabledExercises.count else {
+//                    print("guard")
+//                    return nil
+//                }
+//                print("lastEnabledExercise: \(lastEnabledExercise)")
+//                if lastEnabledExerciseIndex! < index {
+//                    exercisesLeftDuration += exercise.duration
+//                    return exercise
+//                } else {
+//                    return nil
+//                }
+//            }
+//            workouts.append(newWorkout())
+//            print("workout appended")
+//            if exercisesLeft.count > 0 && exercisesLeftDuration < SettingsManager().workoutDuration {
+//                print("arranging once again")
+//                workouts.arrange()
+//            }
+//        } else {
+//            workouts.append(newWorkout())
+////            var lastEnabledExercise: Int
+//            workouts.arrange()
+//        }
+//        print("workouts[0].duration: \(workouts[0].duration())") // index out of range
+//    }
+
+    // Old
+//    func arrange() {
+//        workouts = [] // remove it after completed
+//        var availableExercises: [Exercise] = enabledExercises.map { enabledExercise in
+//            return exercises.filter { $0.id == enabledExercise.id }[0]
+//        }
+////        var exercisesLeft: [Exercise] = []
+////        var durationLeft = SettingsManager().workoutDuration
+//
+//        var lastEnabledExercise: Exercise = availableExercises[0]
+//        var lastEnabledExerciseIndex: Int
+//
+//        func exercisesLeft() -> [Exercise] {
+//            var currentExercises: [Exercise] = []
+//            print("1")
+//            guard workouts.count > 0 else { return availableExercises }
+//            print("workouts.count: \(workouts.count)")
+//            lastEnabledExercise = workouts.last!.exercises!.last!
+//            print("lastEnabledExercise.id: \(lastEnabledExercise.id)")
+//            let lastEnabledExerciseIndex = availableExercises.index(where: {$0 === lastEnabledExercise})
+//            print("2")
+////            var exercisesLeft: [Exercise] = []
+//            for (index, element) in availableExercises.enumerated() {
+//                if index != lastEnabledExerciseIndex! && index > lastEnabledExerciseIndex! {
+////                    exercisesLeft
+//                print("index < lastEnabled")
+//                } else {
+//                    print("index: \(index), lastEnabledIndex: \(lastEnabledExerciseIndex!)")
+//                    currentExercises.append(element)
+//                }
+//            }
+//            print("currentExercises.count: \(currentExercises.count)")
+//            return currentExercises
+//        }
+//
+//        func createWorkout() {
+//            var durationLeft = SettingsManager().workoutDuration
+//            print("4")
+//            let currentExercises: [Exercise]
+//            if workouts.count > 0 {
+//                currentExercises = exercisesLeft()
+//            } else {
+//                currentExercises = availableExercises // rename to exercisesAvailable
+//            }
+//            let exercisesForWorkout: [Exercise] = enabledExercises.flatMap { enabledExercise in
+//                let exercise = exercises.filter { $0.id == enabledExercise.id }[0]
+//                if exercise.duration <= durationLeft {
+//                    durationLeft -= exercise.duration
+//                    print("durationLeft: \(durationLeft)")
+//                    return exercise
+//                } else {
+//                    return nil
+//                }
+//            }
+//            print("appending workout")
+//            if exercisesForWorkout.count > 0 {
+//                workouts.append(Workout.init(next: true, exercises: exercisesForWorkout))
+//            }
+//        }
+//
+//
+//        if enabledExercises.count > 0 {
+//            while exercisesLeft().count > 1 {
+//                print("3")
+//                print("exercises left: \(exercisesLeft())")
+//                // Pass currentExercises back recursively.
+//                createWorkout()
+//            }
+//            // Add remaining exercises to a new workout.
+//            // Repeat workout if no exercises left.
+//        }
+//    }
 }
 
 struct WorkoutFunctions {
@@ -210,20 +356,45 @@ struct WorkoutFunctions {
     }
 }
 
-class Workout: Codable {
-//    let workoutFunctions: WorkoutFunctions = WorkoutFunctions()
+class EnabledExercise: Codable {
+    let id: Int
+    let exerciseID: Int
     let name: String
+    var duration: Int { return exercises.filter { $0.id == exerciseID }[0].duration }
+
+    init(exerciseID: Int, name: String) {
+        self.exerciseID = exerciseID
+        self.name = name
+        if enabledExercises.count > 0 {
+            self.id = enabledExercises.count + 1
+        } else {
+            self.id = 0
+        }
+    }
+}
+
+class Workout: Codable {
+    let name: String? = ""
+    var next: Bool = false
 //    var timeAt: Date
-    var exercises: [Exercise]
-    let reminder: Int = testMode ? 3 : 30
+    var enabledExercises: [EnabledExercise]?
+    let reminder: Int = testMode ? 3 : 30 // delete
 
 //    let delayBeforeExercise: Int = 1
 //    var count: Int = 0
 
-    init(exercises: [Exercise], name: String) {
+    func duration() -> Int {
+        return self.enabledExercises!.reduce(0, { duration, enabledExercise in
+            let exercise = exercises.filter { $0.id == enabledExercise.exerciseID }[0]
+            return exercise.duration + duration
+        })
+    }
+
+    init(next: Bool, exercises: [EnabledExercise]) {
         // https://stackoverflow.com/questions/32332985/how-to-use-audio-in-ios-application-with-swift-2
-        self.name = name
-        self.exercises = exercises
+        self.next = next
+        self.enabledExercises = exercises
+//        self.exercises = exercises
     }
 
     func start() {

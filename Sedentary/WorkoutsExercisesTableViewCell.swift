@@ -15,7 +15,11 @@ class WorkoutsExercisesTableViewCell: UITableViewCell {
     func update(with workout: Workout) {
         nameLabel.text = workout.name
     }
-    
+
+    func update(with enabledExercise: EnabledExercise) {
+        nameLabel.text = enabledExercise.name
+    }
+
     func update(with exercise: Exercise) {
         nameLabel.text = exercise.name
         workoutTimeLabel.isHidden = true

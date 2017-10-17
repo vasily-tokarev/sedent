@@ -22,7 +22,6 @@ class WorkoutsExercisesTableViewController: UITableViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        print("workouts.count: \(workouts.count)")
         tableView.reloadData()
     }
 
@@ -49,7 +48,7 @@ class WorkoutsExercisesTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         var numberOfRows: Int = 0
         if section == workoutsSection {
-            numberOfRows = workouts.count
+            numberOfRows = enabledExercises.count
         } else if section == exercisesSection {
             if exercises.count > 0 {
                 numberOfRows = exercises.count + 1
@@ -76,12 +75,11 @@ class WorkoutsExercisesTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: workoutsExercisesCell, for: indexPath) as! WorkoutsExercisesTableViewCell
-        print("section: \(indexPath.section), workouts section: \(workoutsSection)")
         if indexPath.section == workoutsSection {
-            print("workouts section")
-            if workouts.count > 0 {
-                print("workouts section > 0")
-                cell.update(with: workouts[indexPath.row])
+            if enabledExercises.count > 0 {
+                cell.update(with: enabledExercises[indexPath.row])
+                // Update label with workout.each?.exercises.first.id == enabledExercise  .timeAt
+                // What if there are two of them?
             }
         } else {
             if exercises.count > 0 && indexPath.row <= exercises.count - 1 {
@@ -96,8 +94,6 @@ class WorkoutsExercisesTableViewController: UITableViewController {
                 cell.update(with: "New Exercise")
             }
         }
-
-
         return cell
     }
 
@@ -124,8 +120,8 @@ class WorkoutsExercisesTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             if indexPath.section == workoutsSection {
-                workouts.remove(at: indexPath.row)
-                if workouts.save() {
+                enabledExercises.remove(at: indexPath.row)
+                if enabledExercises.save() {
                     tableView.deleteRows(at: [indexPath], with: .fade)
                 }
             } else {
@@ -149,18 +145,30 @@ class WorkoutsExercisesTableViewController: UITableViewController {
 
         switch true {
             case fromExercisesToWorkouts:
-                let exercise = exercises.filter { $0.id == exercises[fromIndexPath.row].id }[0]
-                workouts.insert(Workout(exercises: exercises, name: exercise.name!), at: to.row)
-                let _ = workouts.save()
-                print("from exercises to workouts")
+                let exercise = exercises[fromIndexPath.row]
+                enabledExercises.insert(EnabledExercise(exerciseID: exercise.id!, name: exercise.name!), at: to.row)
+                let _ = enabledExercises.save()
+//                workouts.arrange()
+//                let _ = workouts.save()
             case fromExercisesToExercises:
                 let movedExercise = exercises[fromIndexPath.row]
                 exercises.remove(at: fromIndexPath.row)
                 exercises.insert(movedExercise, at: to.row)
                 exercises.save()
-                print("from exercises to exercises")
             case fromWorkoutsToWorkouts:
-                print("do nothing yet")
+                let movedExercise = enabledExercises[fromIndexPath.row]
+                enabledExercises.remove(at: fromIndexPath.row)
+                enabledExercises.insert(movedExercise, at: to.row)
+                enabledExercises.save()
+
+                workouts = []
+                workouts.save()
+                print("saved")
+                workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises))
+
+                print("workouts count: \(workouts.count)")
+                print("workouts exercises count: \(workouts[0].enabledExercises!.count)")
+                print("workouts exercises duration: \(workouts[0].duration())")
             case fromWorkoutsToExercises:
                 print("fromWorkoutsToExercises")
                 // Remove workouts[fromIndexPath.row]
