@@ -146,9 +146,9 @@ class WorkoutsExercisesTableViewController: UITableViewController {
         switch true {
             case fromExercisesToWorkouts:
                 let exercise = exercises[fromIndexPath.row]
-                enabledExercises.insert(EnabledExercise(exerciseID: exercise.id!, name: exercise.name!), at: to.row)
+                enabledExercises.insert(EnabledExercise(workoutID: nil, exerciseID: exercise.id!, name: exercise.name!), at: to.row)
+                workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises))
                 let _ = enabledExercises.save()
-//                workouts.arrange()
 //                let _ = workouts.save()
             case fromExercisesToExercises:
                 let movedExercise = exercises[fromIndexPath.row]
