@@ -10,7 +10,7 @@ import Foundation
 import AVFoundation
 import UIKit
 
-var exercises: [Exercise] = DataManager().saved()
+var exercisesGlobal: [Exercise] = DataManager().saved()
 var workouts: [Workout] = DataManager().saved()
 var enabledExercises: [EnabledExercise] = DataManager().saved()
 let workoutsManager: WorkoutsManager = WorkoutsManager()
@@ -25,7 +25,7 @@ class SettingsManager {
 // I'll name you Coach!
 class WorkoutsManager {
     let speechSynthesizer: AVSpeechSynthesizer = AVSpeechSynthesizer()
-    var workouts: [Workout] = []
+//    var workouts: [Workout] = []
     var exercises: [Exercise] = []
 
     func dispatchSpeaker(say speech: String, seconds: Int = 0) {
@@ -36,25 +36,32 @@ class WorkoutsManager {
             })
         } else {
             DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(seconds), execute: {
+                print("speaking seconds: \(seconds)")
                 self.speechSynthesizer.speak(speech)
             })
         }
     }
 
     func start() {
+        workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises))
         let workout = workouts.first
-        let lastExerciseId = exercises.last!.id
-        _ = exercises.reduce(0, { duration, exercise in
-            dispatchSpeaker(say: exercise.speech!.start!, seconds: duration) // 0, 6
+        let exercise = workout!.exercises.first
+        dispatchSpeaker(say: "Exercise started")
+        dispatchSpeaker(say: "30 seconds left", seconds: exercise!.duration - 30)
+        dispatchSpeaker(say: "10 seconds left", seconds: exercise!.duration - 10)
+        dispatchSpeaker(say: "5 seconds left", seconds: exercise!.duration - 5)
+        dispatchSpeaker(say: "Exercise ended", seconds: exercise!.duration)
+
+//        dispatchSpeaker(say: "30 seconds left", seconds: (exercise.duration - (exercise.duration / (exercise.duration / workout!.reminder))) + duration)
+
+//        let lastExerciseId = workout!.exercises.last!.id
+//        _ = workout!.exercises.reduce(0, { duration, exercise in
 //            dispatchSpeaker(say: exercise.speech!.start!, seconds: duration) // 0, 6
-            dispatchSpeaker(say: "30 seconds left", seconds: (exercise.duration - (exercise.duration / (exercise.duration / workout!.reminder))) + duration)
-            if exercise.id == lastExerciseId {
-                dispatchSpeaker(say: "Back to work", seconds: duration + exercise.duration)
-                // Restart timer in MainTableViewController
-            }
-            return duration + exercise.duration
-        })
-        // delay
+//            if exercise.id == lastExerciseId {
+//                dispatchSpeaker(say: "Back to work", seconds: duration + exercise.duration)
+//            }
+//            return duration + exercise.duration
+//        })
     }
 }
 
@@ -148,12 +155,12 @@ extension Array where Element: Exercise {
     private var manager: DataManager<Exercise> { return DataManager() }
 
     var saved: [Exercise] {
-        exercises = manager.saved()
-        return exercises
+        exercisesGlobal = manager.saved()
+        return exercisesGlobal
     }
 
     func save() -> Bool {
-        exercises = self
+        exercisesGlobal = self
         return manager.save(data: self)
     }
 }
@@ -204,9 +211,12 @@ extension Array where Element: Workout {
         }
 
         let sortedExercises = sortExercises(exercises: (exercisesUsed: [], exercisesLeft: exercises.exercisesLeft))
-        workouts.append(Workout(next: true, exercises: sortedExercises.exercisesUsed))
+        workouts.append(Workout(next: true, enabledExercises: sortedExercises.exercisesUsed))
         if sortedExercises.exercisesLeft.count > 0 {
             workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: sortedExercises.exercisesLeft))
+        } else {
+            print("WORKOUTS ARRANGED!: \(workouts.count)")
+            workouts.save()
         }
     }
 }
@@ -233,7 +243,7 @@ class EnabledExercise: Codable {
     let exerciseID: Int
     var workoutID: Int?
     let name: String
-    var duration: Int { return exercises.filter { $0.id == exerciseID }[0].duration }
+    var duration: Int { return exercisesGlobal.filter { $0.id == exerciseID }[0].duration }
 
     init(workoutID: Int?, exerciseID: Int, name: String) {
         self.exerciseID = exerciseID
@@ -255,6 +265,7 @@ class Workout: Codable {
     var next: Bool = false
 //    var timeAt: Date
     var enabledExercises: [EnabledExercise]?
+    var exercises: [Exercise] = []
     let reminder: Int = testMode ? 3 : 30 // delete
 
 //    let delayBeforeExercise: Int = 1
@@ -267,19 +278,29 @@ class Workout: Codable {
         })
     }
 
-    init(next: Bool, exercises: [EnabledExercise]) {
+    init(next: Bool, enabledExercises: [EnabledExercise]) {
         // https://stackoverflow.com/questions/32332985/how-to-use-audio-in-ios-application-with-swift-2
         self.next = next
-        self.enabledExercises = exercises
+        self.enabledExercises = enabledExercises
 //        self.exercises = exercises
         if workouts.count > 0 {
             self.id = workouts.count + 1
         } else {
             self.id = 0
         }
-        self.enabledExercises!.forEach({ exercise in
+        self.enabledExercises!.forEach { exercise in
             exercise.workoutID = self.id
-        })
+        }
+        print("exercises.count: \(exercises.count)")
+        self.exercises = exercisesGlobal.filter { exercise in
+            print("hitting closure")
+            return self.enabledExercises!.contains { enabledExercise in
+                print("enabledExercise.exerciseID: \(enabledExercise.exerciseID)")
+                print("exercise.id: \(exercise.id)")
+                return enabledExercise.exerciseID == exercise.id
+            }
+        }
+        print("workout.exercises.count: \(self.exercises.count)")
     }
 
     func start() {

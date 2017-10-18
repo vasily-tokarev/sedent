@@ -30,13 +30,13 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
 
     @IBAction func saveButtonTapped(_ sender: UIButton) {
         let exerciseId: Int
-        if exercises.count > 0 {
-            exerciseId = exercises.count
+        if exercisesGlobal.count > 0 {
+            exerciseId = exercisesGlobal.count
         } else {
             exerciseId = 0
         }
-        exercises.append(Exercise(id: exerciseId, name: nameTextField.text!, speech: Exercise.Speech(start: "hello")))
-        if exercises.save() {
+        exercisesGlobal.append(Exercise(id: exerciseId, name: nameTextField.text!, speech: Exercise.Speech(start: "hello")))
+        if exercisesGlobal.save() {
             print("going back from ExerciseTableViewController") // This will not execute, will it?
         }
     }
