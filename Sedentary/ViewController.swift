@@ -67,7 +67,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         self.navigationItem.title = "Sedentary"
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(ViewController.tapFunction))
