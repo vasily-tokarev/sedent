@@ -9,7 +9,7 @@
 import UIKit
 
 class WorkoutsExercisesTableViewController: UITableViewController {
-    var selectedCell: Navigation.WorkoutsExercisesTableViewController.Cell?
+    var selectedExerciseIndex: Int?
 
     let workoutsSection: Int = Navigation.WorkoutsExercisesTableViewController.Section.workouts.number
     let workoutsSectionName: String = Navigation.WorkoutsExercisesTableViewController.Section.workouts.name
@@ -62,13 +62,13 @@ class WorkoutsExercisesTableViewController: UITableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == worksoutsExercisesToExercisesSegue {
             let workoutsTableViewController = segue.destination as! ExercisesTableViewController
-            workoutsTableViewController.selectedCell = selectedCell
+            workoutsTableViewController.selectedExerciseIndex = selectedExerciseIndex
         }
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == exercisesSection {
-            selectedCell = Navigation.WorkoutsExercisesTableViewController.Cell.newExercise
+            selectedExerciseIndex = indexPath.row
             performSegue(withIdentifier: worksoutsExercisesToExercisesSegue, sender: nil)
         }
     }
@@ -146,7 +146,7 @@ class WorkoutsExercisesTableViewController: UITableViewController {
         switch true {
             case fromExercisesToWorkouts:
                 let exercise = exercisesGlobal[fromIndexPath.row]
-                enabledExercises.insert(EnabledExercise(workoutID: nil, exerciseID: exercise.id!, name: exercise.name!), at: to.row)
+                enabledExercises.insert(EnabledExercise(workoutId: nil, exerciseId: exercise.id!, name: exercise.name!), at: to.row)
                 workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises))
                 let _ = enabledExercises.save()
 //                let _ = workouts.save()

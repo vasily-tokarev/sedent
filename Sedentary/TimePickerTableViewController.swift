@@ -6,12 +6,7 @@
 //  Copyright © 2017 Vasiliy Tokarev. All rights reserved.
 //
 
-// MAYBE STEPPER???? 30 seconds step.
-// Random exercises which are selected in Manage section?
-// Time to turn off notifications.
-
 // Show total time in manager exercises.
-// Reorder them (show when each exercise will be performed?)
 
 // NEXT EXERCISE AT 12:30 on the main screen.
 
@@ -32,8 +27,6 @@ class TimePickerTableViewController: UITableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // check segue identifier
         // https://medium.com/yay-its-erica/how-to-pass-data-in-an-unwind-segue-swift-3-1c3fa095cde1
-        print("done button tapped")
-        
         let userSettings = UserSettings(notificationInterval: notificationIntervalStepper.value)
         
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -54,19 +47,31 @@ class TimePickerTableViewController: UITableViewController {
     
     @IBAction func notificationIntervalStepperValueChanged(_ sender: UIStepper) {
         let value = String(format: "%.0f", notificationIntervalStepper.value)
-        print(value)
-        print(String(format: "%.0f", "\(value)m"))
-        notificationIntervalStepperLabel.text = "\(value)m"
+        notificationIntervalStepperLabel.text = "\(value) minutes"
     }
     
     @IBAction func workoutDurationStepperValueChanged(_ sender: UIStepper) {
         let value = String(format: "%.0f", workoutDurationStepper.value)
-        workoutDurationStepperLabel.text = "\(value)m"
+        var text: String
+        if workoutDurationStepper.value > 1.0 {
+            text = "minutes"
+        } else {
+            text = "minute"
+        }
+        workoutDurationStepperLabel.text = "\(value) \(text)"
     }
+
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewWillAppear(animated)
+//        let nav = self.navigationController?.navigationBar
+////        nav?.barStyle = UIBarStyle.Black
+//        nav?.tintColor = UIColor.white
+//        nav?.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.white]
+//    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        print("timePickerView did load")
+
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let archiveURL = documentsDirectory.appendingPathComponent("user_settings").appendingPathExtension("plist")
         let propertyListDecoder = PropertyListDecoder()
@@ -95,12 +100,12 @@ class TimePickerTableViewController: UITableViewController {
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 1
+        return 4
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 4
+        return 1
     }
     
     /*

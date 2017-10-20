@@ -20,10 +20,8 @@ class ViewController: UIViewController {
     }
     
     @IBAction func startButtonTapped(_ sender: UIButton) {
-        if exerciseNotificationSwitch.isOn {
-            workoutsManager.start() // and re-arrange
-//            UNUserNotificationCenter.current().removeAllPendingNotificat‌​ionRequests() // TODO: Dismiss notification after start.
-        }
+        // set inactive if exercise is started
+        print("start button tapped")
     }
     
     @IBAction func exerciseNotificationSwitchValueChanged(_ sender: UISwitch) {
@@ -63,6 +61,14 @@ class ViewController: UIViewController {
     @objc func tapFunction(sender:UITapGestureRecognizer) {
         print("tap working")
         performSegue(withIdentifier: "ViewToTimePicker", sender: nil)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        let nav = self.navigationController?.navigationBar
+//        nav?.barStyle = UIBarStyle.Black
+        nav?.tintColor = UIColor.white
+        nav?.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.white]
     }
     
     override func viewDidLoad() {

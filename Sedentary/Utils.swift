@@ -38,17 +38,18 @@ enum Navigation {
         }
     }
     enum WorkoutsExercisesTableViewController {
-        enum Cell: String {
-            case newExercise
-            case editExercise
-            var name: String {
-                switch self {
-                case .newExercise:
-                    return "New Exercise"
-                case .editExercise:
-                    return "Edit Exercise"
-                }
-            }
+        enum Cell {
+//          enum Cell: String {
+//            case newExercise
+//            case editExercise
+//            var name: String {
+//                switch self {
+//                case .newExercise:
+//                    return "New Exercise"
+//                case .editExercise:
+//                    return "Edit Exercise"
+//                }
+//            }
             enum Identifier: String {
                 case workoutsExercisesCell
                 var identifier: String {

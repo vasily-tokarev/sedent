@@ -24,15 +24,16 @@ class WorkoutsExercisesTableViewCell: UITableViewCell {
 //                print("exercise.workoutID: \(exercise.workoutID)")
             })
         })
-        let exerciseWorkouts = workouts.filter({ $0.id == enabledExercise.workoutID })
+        let exerciseWorkouts = workouts.filter({ $0.id == enabledExercise.workoutId })
         if exerciseWorkouts.count > 0 {
             let exerciseWorkout = exerciseWorkouts[0]
 //            print("exerciseWOrkout: \(exerciseWorkout)")
             if exerciseWorkout.enabledExercises![0].id == enabledExercise.id {
 //                print("exerciseWorkout.enabledExercises")
                 workoutTimeLabel.isHidden = false
-                if enabledExercise.workoutID != nil {
-                    workoutTimeLabel.text = String(enabledExercise.workoutID!)
+                if enabledExercise.workoutId != nil {
+//                    workoutTimeLabel.text = String(enabledExercise.workoutID!)
+                    workoutTimeLabel.text = String(workouts.findBy(id: enabledExercise.workoutId!).duration())
                 }
             } else {
                 workoutTimeLabel.isHidden = true

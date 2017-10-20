@@ -19,6 +19,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        exercises.saved.forEach { exercise in print(exercise.name) }
 //    enabledExercises = []
 //        enabledExercises.save()
+
+        UINavigationBar.appearance().barTintColor = UIColor.orange
+        UINavigationBar.appearance().tintColor = UIColor.orange
+        UINavigationBar.appearance().titleTextAttributes = [NSAttributedStringKey.foregroundColor:UIColor.white]
+
+
         return true
     }
 

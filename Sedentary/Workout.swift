@@ -16,6 +16,18 @@ var enabledExercises: [EnabledExercise] = DataManager().saved()
 let workoutsManager: WorkoutsManager = WorkoutsManager()
 
 
+//class NavigationController: UINavigationController, UIViewControllerTransitioningDelegate {
+//
+//    override func viewDidLoad() {
+//        super.viewDidLoad()
+//
+//        // Status bar white font
+////        self.navigationBar.barStyle = UIBarStyle.white
+//        self.navigationBar.tintColor = UIColor.white
+//        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor:UIColor.white]
+//    }
+//}
+
 class SettingsManager {
     let notificationInterval: Int = 120
     let workoutDuration: Int = 120 // or seconds?
@@ -43,14 +55,24 @@ class WorkoutsManager {
     }
 
     func start() {
+        guard workouts.count > 0 else {
+            print("There are no workouts")
+            return
+        }
+        print("starting")
         workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises))
+        print("arranging")
         let workout = workouts.first
+        print("workout")
         let exercise = workout!.exercises.first
-        dispatchSpeaker(say: "Exercise started")
-        dispatchSpeaker(say: "30 seconds left", seconds: exercise!.duration - 30)
-        dispatchSpeaker(say: "10 seconds left", seconds: exercise!.duration - 10)
-        dispatchSpeaker(say: "5 seconds left", seconds: exercise!.duration - 5)
-        dispatchSpeaker(say: "Exercise ended", seconds: exercise!.duration)
+        print("workout.exercises.first")
+        print("exercise: \(exercise)")
+        print("duration: \(exercise!.duration)")
+//        dispatchSpeaker(say: "Exercise started")
+//        dispatchSpeaker(say: "30 seconds left", seconds: exercise!.duration - 30)
+//        dispatchSpeaker(say: "10 seconds left", seconds: exercise!.duration - 10)
+//        dispatchSpeaker(say: "5 seconds left", seconds: exercise!.duration - 5)
+//        dispatchSpeaker(say: "Exercise ended", seconds: exercise!.duration)
 
 //        dispatchSpeaker(say: "30 seconds left", seconds: (exercise.duration - (exercise.duration / (exercise.duration / workout!.reminder))) + duration)
 
@@ -68,23 +90,33 @@ class WorkoutsManager {
 class Exercise: Codable {
     let savePath: String = "exercises"
     let id: Int?
-    var name: String? = "hello"
+    var name: String? = "Exercise"
     var duration: Int = 60
 //    var image: UIImage? = nil
     var speech: Speech?
     var description: String?
 
     init(id: Int? = nil, name: String? = nil, duration: Int? = nil, speech: Speech? = nil, description: String? = nil) {
-        self.id = id // UserExercises.count += DefaultExercises += 1
+        if exercisesGlobal.count > 0 {
+            self.id = exercisesGlobal.count + 1
+        } else {
+            self.id = 0
+        }
+        
         self.name = name
+
         if let duration = duration {
             self.duration = duration
         }
-//        self.duration = duration!
+//        self.duration = duration ?? duration!
+
         if let speech = speech {
             self.speech = speech
         }
-        self.description = description
+
+        if let description = description {
+            self.description = description
+        }
     }
 
     struct Speech: Codable {
@@ -194,6 +226,10 @@ extension Array where Element: Workout {
         return manager.save(data: self)
     }
 
+    func findBy(id: Int) -> Workout {
+        return self.filter { $0.id == id }[0]
+    }
+
     func arrange(exercises: SortedExercisesTuple) {
         var duration = SettingsManager().workoutDuration
 
@@ -215,7 +251,6 @@ extension Array where Element: Workout {
         if sortedExercises.exercisesLeft.count > 0 {
             workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: sortedExercises.exercisesLeft))
         } else {
-            print("WORKOUTS ARRANGED!: \(workouts.count)")
             workouts.save()
         }
     }
@@ -240,22 +275,19 @@ struct WorkoutFunctions {
 
 class EnabledExercise: Codable {
     let id: Int
-    let exerciseID: Int
-    var workoutID: Int?
+    let exerciseId: Int
+    var workoutId: Int?
     let name: String
-    var duration: Int { return exercisesGlobal.filter { $0.id == exerciseID }[0].duration }
+    var duration: Int { return exercisesGlobal.filter { $0.id == exerciseId
+    }[0].duration }
 
-    init(workoutID: Int?, exerciseID: Int, name: String) {
-        self.exerciseID = exerciseID
-        if workoutID != nil {
-            self.workoutID = workoutID
+    init(workoutId: Int?, exerciseId: Int, name: String) {
+        self.exerciseId = exerciseId
+        if workoutId != nil {
+            self.workoutId = workoutId
         }
         self.name = name
-        if enabledExercises.count > 0 {
-            self.id = enabledExercises.count + 1
-        } else {
-            self.id = 0
-        }
+        self.id = enabledExercises.count + 1
     }
 }
 
@@ -273,7 +305,8 @@ class Workout: Codable {
 
     func duration() -> Int {
         return self.enabledExercises!.reduce(0, { duration, enabledExercise in
-            let exercise = exercises.filter { $0.id == enabledExercise.exerciseID }[0]
+            let exercise = exercises.filter { $0.id == enabledExercise.exerciseId
+            }[0]
             return exercise.duration + duration
         })
     }
@@ -283,24 +316,16 @@ class Workout: Codable {
         self.next = next
         self.enabledExercises = enabledExercises
 //        self.exercises = exercises
-        if workouts.count > 0 {
-            self.id = workouts.count + 1
-        } else {
-            self.id = 0
-        }
+        self.id = workouts.count + 1
+
         self.enabledExercises!.forEach { exercise in
-            exercise.workoutID = self.id
+            exercise.workoutId = self.id
         }
-        print("exercises.count: \(exercises.count)")
         self.exercises = exercisesGlobal.filter { exercise in
-            print("hitting closure")
             return self.enabledExercises!.contains { enabledExercise in
-                print("enabledExercise.exerciseID: \(enabledExercise.exerciseID)")
-                print("exercise.id: \(exercise.id)")
-                return enabledExercise.exerciseID == exercise.id
+                return enabledExercise.exerciseId == exercise.id
             }
         }
-        print("workout.exercises.count: \(self.exercises.count)")
     }
 
     func start() {
