@@ -74,6 +74,9 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        print("enabledExercises.count: \(enabledExercises.count)")
+        workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises))
+
         self.navigationItem.title = "Sedentary"
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(ViewController.tapFunction))

@@ -216,11 +216,11 @@ extension Array where Element: EnabledExercise {
         return manager.save(data: self)
     }
 
-    func delete(exercise: Exercise) -> [EnabledExercise] {
-        enabledExercises = enabledExercises.filter { $0.exerciseId != exercise.id}
-        workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises)) // Add a typealias for this.
-        return enabledExercises
-    }
+//    func delete(exercise: Exercise) -> [EnabledExercise] {
+//        enabledExercises = enabledExercises.filter { $0.exerciseId != exercise.id}
+//        workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises)) // Add a typealias for this.
+//        return enabledExercises
+//    }
 }
 
 typealias SortedExercisesTuple = (exercisesUsed: [EnabledExercise], exercisesLeft: [EnabledExercise])
