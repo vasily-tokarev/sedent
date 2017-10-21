@@ -14,8 +14,6 @@ class ExerciseViewController: UIViewController {
         super.viewDidLoad()
         print("ExerciseViewDidLoad")
 
-
-
 //        if exerciseNotificationSwitch.isOn {
 
         workoutsManager.start()

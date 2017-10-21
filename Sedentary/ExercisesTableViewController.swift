@@ -62,8 +62,7 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
                         tenSecondsLeft: tenSecondsLeftSpeechTextField.text,
                         fiveSecondsLeft: fiveSecondsLeftSpeechTextField.text,
                         end: endSpeechTextField.text
-                ),
-                description: descriptionTextView.text
+                )
         )
 
         if let _ = currentExercise {
@@ -82,6 +81,7 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
         if exercisesGlobal.save() {
             print("going back from ExerciseTableViewController") // This will not execute, will it?
         }
+        print(exercisesGlobal.last)
     }
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -117,7 +117,7 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
                 tenSecondsLeftSpeechTextField.text = exercise.speech?.tenSecondsLeft
                 fiveSecondsLeftSpeechTextField.text = exercise.speech?.fiveSecondsLeft
                 endSpeechTextField.text = exercise.speech?.end
-                descriptionTextView.text = exercise.description
+//                descriptionTextView.text = exercise.exerciseDescription
             }
         }
 
@@ -144,7 +144,7 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 6
+        return 5
     }
 /**/
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

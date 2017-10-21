@@ -55,16 +55,19 @@ class WorkoutsManager {
     }
 
     func start() {
-        guard workouts.count > 0 else {
-            print("There are no workouts")
-            return
-        }
+//        guard workouts.count > 0 else {
+//            print("There are no workouts")
+//            return
+//        }
+        workouts = []
         print("starting")
         workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises))
         print("arranging")
         let workout = workouts.first
         print("workout")
         let exercise = workout!.exercises.first
+        print("workouts.count: \(workouts.count)")
+        print("workouts.first.description: \(workouts.first!.description)")
         print("workout.exercises.first")
         print("exercise: \(exercise)")
         print("duration: \(exercise!.duration)")
@@ -94,9 +97,12 @@ class Exercise: Codable {
     var duration: Int = 60
 //    var image: UIImage? = nil
     var speech: Speech?
-    var description: String?
 
-    init(id: Int? = nil, name: String? = nil, duration: Int? = nil, speech: Speech? = nil, description: String? = nil) {
+    var description: String {
+        return "Exercise: #\(self.id) - \(self.name)"
+    }
+
+    init(id: Int? = nil, name: String? = nil, duration: Int? = nil, speech: Speech? = nil) {
         if exercisesGlobal.count > 0 {
             self.id = exercisesGlobal.count + 1
         } else {
@@ -112,10 +118,6 @@ class Exercise: Codable {
 
         if let speech = speech {
             self.speech = speech
-        }
-
-        if let description = description {
-            self.description = description
         }
     }
 
@@ -195,6 +197,10 @@ extension Array where Element: Exercise {
         exercisesGlobal = self
         return manager.save(data: self)
     }
+
+    func findBy(id: Int) -> Exercise {
+        return self.filter { $0.id == id }[0]
+    }
 }
 
 extension Array where Element: EnabledExercise {
@@ -208,6 +214,12 @@ extension Array where Element: EnabledExercise {
     func save() -> Bool {
         enabledExercises = self
         return manager.save(data: self)
+    }
+
+    func delete(exercise: Exercise) -> [EnabledExercise] {
+        enabledExercises = enabledExercises.filter { $0.exerciseId != exercise.id}
+        workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises)) // Add a typealias for this.
+        return enabledExercises
     }
 }
 
@@ -273,7 +285,7 @@ struct WorkoutFunctions {
     }
 }
 
-class EnabledExercise: Codable {
+class EnabledExercise: Codable, Equatable {
     let id: Int
     let exerciseId: Int
     var workoutId: Int?
@@ -289,16 +301,29 @@ class EnabledExercise: Codable {
         self.name = name
         self.id = enabledExercises.count + 1
     }
+
+    static func == (lhs: EnabledExercise, rhs: EnabledExercise) -> Bool{
+        return lhs.id == rhs.id
+    }
 }
 
 class Workout: Codable {
     let id: Int
-    let name: String? = ""
     var next: Bool = false
 //    var timeAt: Date
     var enabledExercises: [EnabledExercise]?
-    var exercises: [Exercise] = []
+    var exercises: [Exercise] {
+        return exercisesGlobal.filter { exercise in
+            return self.enabledExercises!.contains { enabledExercise in
+                return enabledExercise.exerciseId == exercise.id
+            }
+        }
+    }
     let reminder: Int = testMode ? 3 : 30 // delete
+
+    var description: String {
+        return "Workout: #\(self.id), next?: \(self.next), exercises.count: \(self.exercises.count), enabledExercises.count: \(self.enabledExercises!.count)"
+    }
 
 //    let delayBeforeExercise: Int = 1
 //    var count: Int = 0
@@ -321,11 +346,7 @@ class Workout: Codable {
         self.enabledExercises!.forEach { exercise in
             exercise.workoutId = self.id
         }
-        self.exercises = exercisesGlobal.filter { exercise in
-            return self.enabledExercises!.contains { enabledExercise in
-                return enabledExercise.exerciseId == exercise.id
-            }
-        }
+
     }
 
     func start() {

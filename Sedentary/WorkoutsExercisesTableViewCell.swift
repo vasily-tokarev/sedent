@@ -12,9 +12,9 @@ class WorkoutsExercisesTableViewCell: UITableViewCell {
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var workoutTimeLabel: UILabel!
 
-    func update(with workout: Workout) {
-        nameLabel.text = workout.name
-    }
+//    func update(with workout: Workout) {
+//        nameLabel.text = workout.name
+//    }
 
     func update(with enabledExercise: EnabledExercise) {
         nameLabel.text = enabledExercise.name

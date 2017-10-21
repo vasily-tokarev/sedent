@@ -311,11 +311,11 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="Gdi-qt-BdK">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" selectionStyle="default" indentationWidth="10" id="Gdi-qt-BdK">
                                         <rect key="frame" x="0.0" y="587.5" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Gdi-qt-BdK" id="XrS-Eh-GEW">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="44.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Back to work" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="2A3-Qr-4WQ">
@@ -335,39 +335,13 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="Description" id="gKp-Y2-sqN">
-                                <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="qjE-kl-WET">
-                                        <rect key="frame" x="0.0" y="687.5" width="320" height="44"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="qjE-kl-WET" id="ci3-bn-Z5d">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="44.5"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" text="Exercise description. Might take a few lines. Or might not." textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="8EZ-2K-Prk">
-                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="44.5"/>
-                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                                                </textView>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="8EZ-2K-Prk" firstAttribute="leading" secondItem="ci3-bn-Z5d" secondAttribute="leading" id="79y-yL-CNN"/>
-                                                <constraint firstAttribute="bottom" secondItem="8EZ-2K-Prk" secondAttribute="bottom" id="7Wo-AP-wb9"/>
-                                                <constraint firstItem="8EZ-2K-Prk" firstAttribute="top" secondItem="ci3-bn-Z5d" secondAttribute="top" id="MuN-Wy-bUT"/>
-                                                <constraint firstAttribute="trailing" secondItem="8EZ-2K-Prk" secondAttribute="trailing" id="pSW-c3-3xD"/>
-                                            </constraints>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                </cells>
-                            </tableViewSection>
                             <tableViewSection id="QGO-1R-lhv">
                                 <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="O5O-C3-wxs">
-                                        <rect key="frame" x="0.0" y="767.5" width="320" height="44"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" selectionStyle="default" indentationWidth="10" id="O5O-C3-wxs">
+                                        <rect key="frame" x="0.0" y="667.5" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="O5O-C3-wxs" id="uOe-CA-OeV">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="44.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Y91-OA-NE2" userLabel="Save">
@@ -396,7 +370,6 @@
                         </connections>
                     </tableView>
                     <connections>
-                        <outlet property="descriptionTextView" destination="8EZ-2K-Prk" id="rp2-BA-Jit"/>
                         <outlet property="durationLabel" destination="1zF-kR-cMo" id="KnN-Bs-yjN"/>
                         <outlet property="durationStepper" destination="bKK-af-xJd" id="leK-tO-MnX"/>
                         <outlet property="endSpeechTextField" destination="2A3-Qr-4WQ" id="2ei-Jz-m8t"/>

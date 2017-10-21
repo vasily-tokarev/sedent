@@ -125,6 +125,7 @@ class WorkoutsExercisesTableViewController: UITableViewController {
                     tableView.deleteRows(at: [indexPath], with: .fade)
                 }
             } else {
+                enabledExercises = enabledExercises.delete(exercise: exercisesGlobal[indexPath.row])
                 exercisesGlobal.remove(at: indexPath.row)
                 if exercisesGlobal.save() {
                     tableView.deleteRows(at: [indexPath], with: .fade)
@@ -144,36 +145,37 @@ class WorkoutsExercisesTableViewController: UITableViewController {
         let fromWorkoutsToWorkouts = fromIndexPath.section == workoutsSection && to.section == workoutsSection
 
         switch true {
-            case fromExercisesToWorkouts:
-                let exercise = exercisesGlobal[fromIndexPath.row]
+        case fromExercisesToWorkouts:
+            let exercise = exercisesGlobal[fromIndexPath.row]
+            if exercise.duration < SettingsManager().workoutDuration {
                 enabledExercises.insert(EnabledExercise(workoutId: nil, exerciseId: exercise.id!, name: exercise.name!), at: to.row)
                 workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises))
                 let _ = enabledExercises.save()
-//                let _ = workouts.save()
-            case fromExercisesToExercises:
-                let movedExercise = exercisesGlobal[fromIndexPath.row]
-                exercisesGlobal.remove(at: fromIndexPath.row)
-                exercisesGlobal.insert(movedExercise, at: to.row)
-                exercisesGlobal.save()
-            case fromWorkoutsToWorkouts:
-                let movedExercise = enabledExercises[fromIndexPath.row]
-                enabledExercises.remove(at: fromIndexPath.row)
-                enabledExercises.insert(movedExercise, at: to.row)
-                enabledExercises.save()
+            }
+        case fromExercisesToExercises:
+            let movedExercise = exercisesGlobal[fromIndexPath.row]
+            exercisesGlobal.remove(at: fromIndexPath.row)
+            exercisesGlobal.insert(movedExercise, at: to.row)
+            exercisesGlobal.save()
+        case fromWorkoutsToWorkouts:
+            let movedExercise = enabledExercises[fromIndexPath.row]
+            enabledExercises.remove(at: fromIndexPath.row)
+            enabledExercises.insert(movedExercise, at: to.row)
+            enabledExercises.save()
 
-                workouts = []
-                workouts.save()
-                print("saved")
-                workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises))
+            workouts = []
+            workouts.save()
+            print("saved")
+            workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises))
 
 //                print("workouts count: \(workouts.count)")
 //                print("workouts exercises count: \(workouts[0].enabledExercises!.count)")
 //                print("workouts exercises duration: \(workouts[0].duration())")
-            case fromWorkoutsToExercises:
-                print("fromWorkoutsToExercises")
+        case fromWorkoutsToExercises:
+            print("fromWorkoutsToExercises")
                 // Remove workouts[fromIndexPath.row]
-            default:
-                print("default")
+        default:
+            print("default")
         }
 
         tableView.reloadData() // Remove it after arrange() is implemented.
