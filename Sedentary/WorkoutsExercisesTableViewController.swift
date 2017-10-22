@@ -125,21 +125,8 @@ class WorkoutsExercisesTableViewController: UITableViewController {
                     tableView.deleteRows(at: [indexPath], with: .fade)
                 }
             } else {
-                print("enabledExercises.count 1: \(enabledExercises.count)")
-                // enabledExercises.remove(at: exerciseindexpath)
-
-                // there could be multiple enabledExercises!!!!!
-
-
-//                let indicesToDelete: [Int] = enabledExercises.filter { $0.exerciseId == exercisesGlobal[indexPath.row].id }.map {
-//                    $0.id
-//                }
-
-//                print("indexToDelete: \(indexToDelete)")
-
                 let enabledExercisesToDelete = enabledExercises.filter { $0.exerciseId == exercisesGlobal[indexPath.row].id}
                 let indicesToDelete: [Int] = enabledExercisesToDelete.map { enabledExercises.index(of: $0)! }
-                print("indicesToDelete.count: \(indicesToDelete.count)")
 
                 enabledExercises = enabledExercises.filter { $0.exerciseId != exercisesGlobal[indexPath.row].id}
                 workouts.arrange(exercises: (
@@ -153,15 +140,8 @@ class WorkoutsExercisesTableViewController: UITableViewController {
                     }
                     tableView.deleteRows(at: paths, with: UITableViewRowAnimation.automatic)
                 }
-
-//                }
-
-                print("indexPath: \(indexPath)")
-                print("enabledExercises.count 2: \(enabledExercises.count)")
                 exercisesGlobal.remove(at: indexPath.row)
-                print("exercisesGlobal.count 1: \(exercisesGlobal.count)")
                 if exercisesGlobal.save() {
-                    print("exercisesGlobal.count 2: \(exercisesGlobal.count)")
                     tableView.deleteRows(at: [indexPath], with: .fade)
                 }
                 tableView.reloadData()
@@ -200,7 +180,6 @@ class WorkoutsExercisesTableViewController: UITableViewController {
 
             workouts = []
             workouts.save()
-            print("saved")
             workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises))
 
 //                print("workouts count: \(workouts.count)")

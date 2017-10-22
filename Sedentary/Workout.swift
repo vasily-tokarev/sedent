@@ -13,19 +13,53 @@ import UIKit
 var exercisesGlobal: [Exercise] = DataManager().saved()
 var workouts: [Workout] = DataManager().saved()
 var enabledExercises: [EnabledExercise] = DataManager().saved()
-let workoutsManager: WorkoutsManager = WorkoutsManager()
+//let coach: Coach = Coach()
 
-
-//class NavigationController: UINavigationController, UIViewControllerTransitioningDelegate {
+//class NetworkController {
+//    var data: Data?
+//    let session = URLSession.shared
+//    var delegate: BoardTableViewController?
 //
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//
-//        // Status bar white font
-////        self.navigationBar.barStyle = UIBarStyle.white
-//        self.navigationBar.tintColor = UIColor.white
-//        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor:UIColor.white]
+//    func fetchDoesCallSucceed(board: Item) {
+//        let task = session.dataTask(with: URL(string: board.url)!) {
+//            (data, response, error) in
+//            // TODO: Handle error response.
+//            let success = error == nil
+//            self.data = data
+//            self.delegate?.didGetResult(success)
+//        }
+//        task.resume()
 //    }
+//}
+
+
+// BoardTableViewController
+//let networkController = NetworkController()
+//var hasData: Bool = false
+//func didGetResult(_ success: Bool) {
+//    self.hasData = success
+//
+//    if let data = networkController.data {
+//        if board!.chan == ChanName.fourChan {
+//            self.fetchFourChanThreads(data: data)
+//        }
+//        if board!.chan == ChanName.dvach {
+//            self.fetchDvachThreads(data: data)
+//        }
+//    }
+//
+//    DispatchQueue.main.sync {
+//        self.tableView.reloadData()
+////            tableView.contentInset = UIEdgeInsetsMake(20.0, 0.0, 0.0, 0.0)
+//        tableView.rowHeight = UITableViewAutomaticDimension
+//        tableView.estimatedRowHeight = 120
+//    }
+//}
+//func reloadTableViewAfterNetworkCall() {
+//    messages.removeAll()
+//    self.tableView.reloadData()
+//    networkController.delegate = self
+//    networkController.fetchDoesCallSucceed(board: board!)
 //}
 
 class SettingsManager {
@@ -35,10 +69,13 @@ class SettingsManager {
 }
 
 // I'll name you Coach!
-class WorkoutsManager {
+class Coach {
     let speechSynthesizer: AVSpeechSynthesizer = AVSpeechSynthesizer()
 //    var workouts: [Workout] = []
     var exercises: [Exercise] = []
+    var delegate: ExerciseViewController?
+//    var exerciseTimer: Timer = Timer()
+    var currentExercise: Exercise?
 
     func dispatchSpeaker(say speech: String, seconds: Int = 0) {
         let speech = AVSpeechUtterance(string: speech)
@@ -54,28 +91,28 @@ class WorkoutsManager {
         }
     }
 
-    func start() {
+    func startWorkout() {
 //        guard workouts.count > 0 else {
 //            print("There are no workouts")
 //            return
 //        }
         workouts = []
-        print("starting")
         workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises))
-        print("arranging")
         let workout = workouts.first
-        print("workout")
         let exercise = workout!.exercises.first
-        print("workouts.count: \(workouts.count)")
-        print("workouts.first.description: \(workouts.first!.description)")
-        print("workout.exercises.first")
-        print("exercise: \(exercise)")
-        print("duration: \(exercise!.duration)")
-//        dispatchSpeaker(say: "Exercise started")
-//        dispatchSpeaker(say: "30 seconds left", seconds: exercise!.duration - 30)
-//        dispatchSpeaker(say: "10 seconds left", seconds: exercise!.duration - 10)
-//        dispatchSpeaker(say: "5 seconds left", seconds: exercise!.duration - 5)
-//        dispatchSpeaker(say: "Exercise ended", seconds: exercise!.duration)
+        currentExercise = exercise
+        print("delegate!")
+        if let delegate = self.delegate {
+            print("delegate success")
+            self.delegate!.startTimer()
+        }
+        print("startTimer()")
+//        self.startTimer()
+        dispatchSpeaker(say: "Exercise started")
+        dispatchSpeaker(say: "30 seconds left", seconds: exercise!.duration - 30)
+        dispatchSpeaker(say: "10 seconds left", seconds: exercise!.duration - 10)
+        dispatchSpeaker(say: "5 seconds left", seconds: exercise!.duration - 5)
+        dispatchSpeaker(say: "Exercise ended", seconds: exercise!.duration)
 
 //        dispatchSpeaker(say: "30 seconds left", seconds: (exercise.duration - (exercise.duration / (exercise.duration / workout!.reminder))) + duration)
 
@@ -88,6 +125,26 @@ class WorkoutsManager {
 //            return duration + exercise.duration
 //        })
     }
+
+//    func startTimer() {
+//        exerciseTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(ExerciseViewController.updateTimer), userInfo: nil, repeats: true)
+//    }
+
+//    func restartTimer() {
+//        exerciseTimer.invalidate()
+//        startTimer()
+//    }
+
+//    @objc func updateTimer() {
+//        let secondsSinceNotificationCreated = Date().timeIntervalSince(dateNotificationCreated!)
+//        let secondsLeft = (Int(timeInterval) - Int(secondsSinceNotificationCreated)) % 60
+//        let minutesLeft = ((Int(timeInterval) - Int(secondsSinceNotificationCreated)) / 60)
+//        exerciseTimerLabel.text = String(format: "%02i:%02i", Int(minutesLeft), Int(secondsLeft))
+//        if secondsSinceNotificationCreated > timeInterval {
+//            exerciseTimer.invalidate()
+//            startButton.isEnabled = true
+//        }
+//    }
 }
 
 class Exercise: Codable {
