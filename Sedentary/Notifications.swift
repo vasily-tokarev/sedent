@@ -7,52 +7,52 @@
 //
 
 import Foundation
-
-import Foundation
 import UserNotifications
 
-// Timer
-//let timeInterval = 1.0
-let timeInterval = testMode ? 1.0 : 2400.0
-var trigger: UNNotificationTrigger?
-var dateNotificationCreated: Date?
+class Notifications {
+    let notificationInterval = state.settings[0].notificationIntervalInSeconds
+    var trigger: UNNotificationTrigger?
+    var dateNotificationCreated: Date?
 
-// Notifications
-let center = UNUserNotificationCenter.current()
-let options: UNAuthorizationOptions = [.alert, .sound]
+    let center = UNUserNotificationCenter.current()
+    let options: UNAuthorizationOptions = [.alert, .sound]
 
-func setupNotifications() {
-    center.requestAuthorization(options: options) {
-        (granted, error) in
-        if !granted {
-            print("Something went wrong")
+    func setupNotifications() {
+        center.requestAuthorization(options: options) {
+            (granted, error) in
+            if !granted {
+                print("Something went wrong")
+            }
+        }
+        center.getNotificationSettings { (settings) in
+            if settings.authorizationStatus != .authorized {
+                // Notifications not allowed
+            }
         }
     }
-    center.getNotificationSettings { (settings) in
-        if settings.authorizationStatus != .authorized {
-            // Notifications not allowed
-        }
-    }
-}
 
-func createNotification() {
-    dateNotificationCreated = Date()
-    let content = UNMutableNotificationContent()
-    content.title = "Exercise"
-    content.body = "It is time to move!"
-    content.sound = UNNotificationSound.default()
-    trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInterval,
-                                                repeats: false)
-    
-    let identifier = "UYLLocalNotification"
-    //    print(timeInterval)
-    print(trigger)
-    let request = UNNotificationRequest(identifier: identifier,
-                                        content: content, trigger: trigger)
-    //    print(trigger.nextTriggerDate()?.timeIntervalSince(date))
-    center.add(request, withCompletionHandler: { (error) in
-        if let error = error {
-            // Something went wrong
-        }
-    })
+    func createNotification() {
+        dateNotificationCreated = Date()
+        let content = UNMutableNotificationContent()
+//    content.title = "Notification"
+        content.body = state.settings[0].notificationText
+        content.sound = UNNotificationSound.default()
+        trigger = UNTimeIntervalNotificationTrigger(timeInterval: notificationInterval,
+                repeats: false)
+
+        let identifier = "UYLLocalNotification"
+        let request = UNNotificationRequest(identifier: identifier,
+                content: content, trigger: trigger)
+        //    print(trigger.nextTriggerDate()?.timeIntervalSince(date))
+        center.add(request, withCompletionHandler: { (error) in
+            if let error = error {
+                print("Notifications error: \(error)")
+                // Something went wrong
+            }
+        })
+    }
+
+    init() {
+        setupNotifications()
+    }
 }

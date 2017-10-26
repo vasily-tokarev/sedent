@@ -1,56 +1,40 @@
 //
-//  TimePickerTableViewController.swift
+//  SettingsTableViewController.swift
 //  Sedentary
 //
 //  Created by vt on 10/5/17.
 //  Copyright © 2017 Vasiliy Tokarev. All rights reserved.
 //
 
-// Show total time in manager exercises.
-
-// NEXT EXERCISE AT 12:30 on the main screen.
-
 import UIKit
 
-struct UserSettings: Codable {
-    let notificationInterval: Double
-//    let worksouts
-}
+class SettingsTableViewController: UITableViewController {
+    var settings: Settings = state.settings[0]
 
-class TimePickerTableViewController: UITableViewController {
     @IBOutlet weak var notificationIntervalStepper: UIStepper!
     @IBOutlet weak var notificationIntervalStepperLabel: UILabel!
     
     @IBOutlet weak var workoutDurationStepper: UIStepper!
     @IBOutlet weak var workoutDurationStepperLabel: UILabel!
     
+    @IBOutlet weak var notificationTextField: UITextField!
+    @IBOutlet weak var autostartSwitch: UISwitch!
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // check segue identifier
         // https://medium.com/yay-its-erica/how-to-pass-data-in-an-unwind-segue-swift-3-1c3fa095cde1
-        let userSettings = UserSettings(notificationInterval: notificationIntervalStepper.value)
-        
-        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let archiveURL = documentsDirectory.appendingPathComponent("user_settings").appendingPathExtension("plist")
-        let propertyListEncoder = PropertyListEncoder()
-        let encodedUserSettings = try? propertyListEncoder.encode(userSettings)
-        
-        try? encodedUserSettings?.write(to: archiveURL, options: .noFileProtection)
-        
-        // reading
-        let propertyListDecoder = PropertyListDecoder()
-        if let retrievedUserSettingsData = try? Data(contentsOf: archiveURL),
-            let decodedUserSettings = try?
-                propertyListDecoder.decode(UserSettings.self, from: retrievedUserSettingsData) {
-            print(decodedUserSettings)
-        }
+        state.settings[0] = settings
+        let _ = state.settings.save()
     }
     
     @IBAction func notificationIntervalStepperValueChanged(_ sender: UIStepper) {
+        settings.notificationInterval = notificationIntervalStepper.value
         let value = String(format: "%.0f", notificationIntervalStepper.value)
         notificationIntervalStepperLabel.text = "\(value) minutes"
     }
     
     @IBAction func workoutDurationStepperValueChanged(_ sender: UIStepper) {
+        settings.workoutDuration = workoutDurationStepper.value
         let value = String(format: "%.0f", workoutDurationStepper.value)
         var text: String
         if workoutDurationStepper.value > 1.0 {
@@ -60,6 +44,10 @@ class TimePickerTableViewController: UITableViewController {
         }
         workoutDurationStepperLabel.text = "\(value) \(text)"
     }
+    
+    @IBAction func autostartSwitchValueChanged(_ sender: UISwitch) {
+    }
+    
 
 //    override func viewWillAppear(_ animated: Bool) {
 //        super.viewWillAppear(animated)
@@ -72,18 +60,22 @@ class TimePickerTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let archiveURL = documentsDirectory.appendingPathComponent("user_settings").appendingPathExtension("plist")
-        let propertyListDecoder = PropertyListDecoder()
-        if let retrievedUserSettingsData = try? Data(contentsOf: archiveURL),
-            let decodedUserSettings = try?
-                propertyListDecoder.decode(UserSettings.self, from: retrievedUserSettingsData) {
-            print(decodedUserSettings)
-            notificationIntervalStepper.value = decodedUserSettings.notificationInterval
-            let value = String(format: "%.0f", decodedUserSettings.notificationInterval)
-            notificationIntervalStepperLabel.text = "\(value)m"
+        notificationIntervalStepper.value = state.settings[0].notificationInterval
+
+        let notificationIntervalString = String(format: "%.0f", state.settings[0].notificationInterval)
+        notificationIntervalStepperLabel.text = "\(notificationIntervalString) minutes"
+        print(notificationIntervalString)
+
+        workoutDurationStepper.value = state.settings[0].workoutDuration
+        let workoutDurationString = String(format: "%.0f", workoutDurationStepper.value)
+        var text: String
+        if workoutDurationStepper.value > 1.0 {
+            text = "minutes"
+        } else {
+            text = "minute"
         }
-        
+        workoutDurationStepperLabel.text = "\(workoutDurationString) \(text)"
+
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
         
@@ -100,7 +92,7 @@ class TimePickerTableViewController: UITableViewController {
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 4
+        return 3
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

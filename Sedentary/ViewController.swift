@@ -10,24 +10,29 @@ import UIKit
 import UserNotifications
 import AVFoundation
 
+//ViewControllerError.dateNotificationCreatedNotSet
+enum ViewControllerError: Error {
+    case dateNotificationCreatedNotSet
+}
+
 class ViewController: UIViewController {
     @IBOutlet weak var startButton: UIButton!
     @IBOutlet weak var exerciseNotificationSwitch: UISwitch!
     @IBOutlet weak var exerciseTimerLabel: UILabel!
-    
+
+    var workoutCompleted: Bool = false
+
     @IBAction func unwindToMain(segue: UIStoryboardSegue) {
         print("unwinding")
     }
-    
+
     @IBAction func startButtonTapped(_ sender: UIButton) {
-        // set inactive if exercise is started
-        print("start button tapped")
+//        startButton.setTitle("Resume", for: .normal)
     }
-    
+
     @IBAction func exerciseNotificationSwitchValueChanged(_ sender: UISwitch) {
         if exerciseNotificationSwitch.isOn {
-            setupNotifications()
-            createNotification()
+//            createNotification()
             startTimer()
         } else {
             exerciseTimerLabel.text = "00:00"
@@ -35,29 +40,35 @@ class ViewController: UIViewController {
             // TODO: Remove pending notification if any.
         }
     }
-    
+
     var timer: Timer = Timer()
-    
+
     func startTimer() {
+        notifications.createNotification()
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(ViewController.updateTimer), userInfo: nil, repeats: true)
     }
-    
+
     func restartTimer() {
         timer.invalidate()
         startTimer()
     }
-    
-    @objc func updateTimer() {
-        let secondsSinceNotificationCreated = Date().timeIntervalSince(dateNotificationCreated!)
-        let secondsLeft = (Int(timeInterval) - Int(secondsSinceNotificationCreated)) % 60
-        let minutesLeft = ((Int(timeInterval) - Int(secondsSinceNotificationCreated)) / 60)
+
+    @objc func updateTimer() throws {
+        guard let dateNotificationCreated = notifications.dateNotificationCreated else {
+            print("ViewControllerError.dateNotificationCreatedNotSet")
+            throw ViewControllerError.dateNotificationCreatedNotSet
+        }
+
+        let secondsSinceNotificationCreated = Date().timeIntervalSince(dateNotificationCreated)
+        let secondsLeft = (Int(notifications.notificationInterval) - Int(secondsSinceNotificationCreated)) % 60
+        let minutesLeft = ((Int(notifications.notificationInterval) - Int(secondsSinceNotificationCreated)) / 60)
         exerciseTimerLabel.text = String(format: "%02i:%02i", Int(minutesLeft), Int(secondsLeft))
-        if secondsSinceNotificationCreated > timeInterval {
+        if secondsSinceNotificationCreated > notifications.notificationInterval {
             timer.invalidate()
             startButton.isEnabled = true
         }
     }
-    
+
     @objc func tapFunction(sender:UITapGestureRecognizer) {
         print("tap working")
         performSegue(withIdentifier: "ViewToTimePicker", sender: nil)
@@ -65,26 +76,39 @@ class ViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        print("view will appear!")
+
+        if self.workoutCompleted && exerciseNotificationSwitch.isOn {
+            startTimer()
+        }
+        self.workoutCompleted = false
+
+//        startTimer()
+//        print("timer started")
+
         let nav = self.navigationController?.navigationBar
 //        nav?.barStyle = UIBarStyle.Black
         nav?.tintColor = UIColor.white
         nav?.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.white]
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        coach.mainViewDelegate = self
 
-        print("enabledExercises.count: \(enabledExercises.count)")
-        workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises))
+        print("state.enabledExercises.count: \(state.enabledExercises.count)")
+        state.workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: state.enabledExercises))
+        print("arranged")
 
         self.navigationItem.title = "Sedentary"
-        
+
         let tap = UITapGestureRecognizer(target: self, action: #selector(ViewController.tapFunction))
         exerciseTimerLabel.isUserInteractionEnabled = true
         exerciseTimerLabel.addGestureRecognizer(tap)
-        
+        print("view loaded")
+
         // if timer started = timer false else timer default value
-        
+
         // Do any additional setup after loading the view, typically from a nib.
     }
 

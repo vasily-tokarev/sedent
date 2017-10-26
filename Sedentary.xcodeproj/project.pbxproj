@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		770174FD1F84F541002A988F /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 770174FC1F84F541002A988F /* Workout.swift */; };
-		770175011F864BB0002A988F /* TimePickerTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 770175001F864BB0002A988F /* TimePickerTableViewController.swift */; };
+		770175011F864BB0002A988F /* SettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 770175001F864BB0002A988F /* SettingsTableViewController.swift */; };
 		771F8B0B1F84E533003DB06A /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 771F8B0A1F84E533003DB06A /* Notifications.swift */; };
 		771F8B0D1F84E56A003DB06A /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 771F8B0C1F84E56A003DB06A /* Utils.swift */; };
 		775729E81F83737500D3F83F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775729E71F83737500D3F83F /* AppDelegate.swift */; };
@@ -19,7 +19,7 @@
 		775729F51F83737500D3F83F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 775729F31F83737500D3F83F /* LaunchScreen.storyboard */; };
 		77572A001F83737600D3F83F /* SedentaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775729FF1F83737600D3F83F /* SedentaryTests.swift */; };
 		77572A0B1F83737600D3F83F /* SedentaryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77572A0A1F83737600D3F83F /* SedentaryUITests.swift */; };
-		7775CDCF1F98D701008DD836 /* ExerciseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7775CDCE1F98D701008DD836 /* ExerciseViewController.swift */; };
+		7775CDCF1F98D701008DD836 /* CoachViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7775CDCE1F98D701008DD836 /* CoachViewController.swift */; };
 		77D78D351F880D5A00A3FCCC /* ExercisesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77D78D341F880D5A00A3FCCC /* ExercisesTableViewCell.swift */; };
 		77E51E6B1F87BC5C00E8FBE6 /* WorkoutsExercisesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77E51E691F87BC5C00E8FBE6 /* WorkoutsExercisesTableViewCell.swift */; };
 		77E51E6C1F87BC5C00E8FBE6 /* WorkoutsExercisesTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77E51E6A1F87BC5C00E8FBE6 /* WorkoutsExercisesTableViewController.swift */; };
@@ -45,7 +45,7 @@
 
 /* Begin PBXFileReference section */
 		770174FC1F84F541002A988F /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
-		770175001F864BB0002A988F /* TimePickerTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimePickerTableViewController.swift; sourceTree = "<group>"; };
+		770175001F864BB0002A988F /* SettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewController.swift; sourceTree = "<group>"; };
 		771F8B0A1F84E533003DB06A /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		771F8B0C1F84E56A003DB06A /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		775729E41F83737500D3F83F /* Sedentary.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sedentary.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -62,7 +62,7 @@
 		77572A061F83737600D3F83F /* SedentaryUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SedentaryUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		77572A0A1F83737600D3F83F /* SedentaryUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SedentaryUITests.swift; sourceTree = "<group>"; };
 		77572A0C1F83737600D3F83F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7775CDCE1F98D701008DD836 /* ExerciseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseViewController.swift; sourceTree = "<group>"; };
+		7775CDCE1F98D701008DD836 /* CoachViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachViewController.swift; sourceTree = "<group>"; };
 		77D78D341F880D5A00A3FCCC /* ExercisesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisesTableViewCell.swift; sourceTree = "<group>"; };
 		77E51E691F87BC5C00E8FBE6 /* WorkoutsExercisesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutsExercisesTableViewCell.swift; sourceTree = "<group>"; };
 		77E51E6A1F87BC5C00E8FBE6 /* WorkoutsExercisesTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutsExercisesTableViewController.swift; sourceTree = "<group>"; };
@@ -119,13 +119,13 @@
 			children = (
 				775729EB1F83737500D3F83F /* Main.storyboard */,
 				770174FC1F84F541002A988F /* Workout.swift */,
-				7775CDCE1F98D701008DD836 /* ExerciseViewController.swift */,
+				7775CDCE1F98D701008DD836 /* CoachViewController.swift */,
 				775729E71F83737500D3F83F /* AppDelegate.swift */,
 				77E51E6F1F87D33F00E8FBE6 /* ExercisesTableViewController.swift */,
 				77D78D341F880D5A00A3FCCC /* ExercisesTableViewCell.swift */,
 				77E51E691F87BC5C00E8FBE6 /* WorkoutsExercisesTableViewCell.swift */,
 				77E51E6A1F87BC5C00E8FBE6 /* WorkoutsExercisesTableViewController.swift */,
-				770175001F864BB0002A988F /* TimePickerTableViewController.swift */,
+				770175001F864BB0002A988F /* SettingsTableViewController.swift */,
 				775729E91F83737500D3F83F /* ViewController.swift */,
 				771F8B0A1F84E533003DB06A /* Notifications.swift */,
 				771F8B0C1F84E56A003DB06A /* Utils.swift */,
@@ -296,10 +296,10 @@
 				77E51E6C1F87BC5C00E8FBE6 /* WorkoutsExercisesTableViewController.swift in Sources */,
 				771F8B0D1F84E56A003DB06A /* Utils.swift in Sources */,
 				775729E81F83737500D3F83F /* AppDelegate.swift in Sources */,
-				770175011F864BB0002A988F /* TimePickerTableViewController.swift in Sources */,
+				770175011F864BB0002A988F /* SettingsTableViewController.swift in Sources */,
 				770174FD1F84F541002A988F /* Workout.swift in Sources */,
 				775729F01F83737500D3F83F /* Sedentary.xcdatamodeld in Sources */,
-				7775CDCF1F98D701008DD836 /* ExerciseViewController.swift in Sources */,
+				7775CDCF1F98D701008DD836 /* CoachViewController.swift in Sources */,
 				77E51E6B1F87BC5C00E8FBE6 /* WorkoutsExercisesTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

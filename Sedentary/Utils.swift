@@ -15,6 +15,8 @@ enum Navigation {
         case workoutsExercisesToExercises
         case collapsibleToBoards
         case mainToWorkouts
+
+        case unwindToWorkoutsExercises
         var identifier: String {
             switch self {
             case .workoutsExercisesToExercises:
@@ -23,6 +25,8 @@ enum Navigation {
                 return "CollapsibleToBoards"
             case .mainToWorkouts:
                 return "MainToWorkouts"
+            case .unwindToWorkoutsExercises:
+                 return "unwindToWorkoutsExercises"
             }
         }
     }

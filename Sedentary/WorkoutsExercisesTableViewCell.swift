@@ -19,12 +19,12 @@ class WorkoutsExercisesTableViewCell: UITableViewCell {
     func update(with enabledExercise: EnabledExercise) {
         nameLabel.text = enabledExercise.name
 //        print("enabledExercise.workoutID \(enabledExercise.workoutID)")
-        workouts.forEach({ workout in
+        state.workouts.forEach({ workout in
             workout.enabledExercises!.forEach({exercise in
 //                print("exercise.workoutID: \(exercise.workoutID)")
             })
         })
-        let exerciseWorkouts = workouts.filter({ $0.id == enabledExercise.workoutId })
+        let exerciseWorkouts = state.workouts.filter({ $0.id == enabledExercise.workoutId })
         if exerciseWorkouts.count > 0 {
             let exerciseWorkout = exerciseWorkouts[0]
 //            print("exerciseWOrkout: \(exerciseWorkout)")
@@ -33,7 +33,7 @@ class WorkoutsExercisesTableViewCell: UITableViewCell {
                 workoutTimeLabel.isHidden = false
                 if enabledExercise.workoutId != nil {
 //                    workoutTimeLabel.text = String(enabledExercise.workoutID!)
-                    workoutTimeLabel.text = String(workouts.findBy(id: enabledExercise.workoutId!).duration())
+                    workoutTimeLabel.text = String(state.workouts.findBy(id: enabledExercise.workoutId!).duration)
                 }
             } else {
                 workoutTimeLabel.isHidden = true

@@ -20,6 +20,10 @@ class WorkoutsExercisesTableViewController: UITableViewController {
 
     let workoutsExercisesCell: String = Navigation.WorkoutsExercisesTableViewController.Cell.Identifier.workoutsExercisesCell.identifier
 
+    @IBAction func unwindToWorkoutsExercises(segue: UIStoryboardSegue) {
+//        print("unwinding to")
+    }
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.reloadData()
@@ -48,10 +52,10 @@ class WorkoutsExercisesTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         var numberOfRows: Int = 0
         if section == workoutsSection {
-            numberOfRows = enabledExercises.count
+            numberOfRows = state.enabledExercises.count
         } else if section == exercisesSection {
-            if exercisesGlobal.count > 0 {
-                numberOfRows = exercisesGlobal.count + 1
+            if state.exercises.count > 0 {
+                numberOfRows = state.exercises.count + 1
             } else {
                 numberOfRows = 1
             }
@@ -76,21 +80,21 @@ class WorkoutsExercisesTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: workoutsExercisesCell, for: indexPath) as! WorkoutsExercisesTableViewCell
         if indexPath.section == workoutsSection {
-            if enabledExercises.count > 0 {
-                cell.update(with: enabledExercises[indexPath.row])
+            if state.enabledExercises.count > 0 {
+                cell.update(with: state.enabledExercises[indexPath.row])
                 // Update label with workout.each?.exercises.first.id == enabledExercise  .timeAt
                 // What if there are two of them?
             }
         } else {
-            if exercisesGlobal.count > 0 && indexPath.row <= exercisesGlobal.count - 1 {
-                cell.update(with: exercisesGlobal[indexPath.row])
+            if state.exercises.count > 0 && indexPath.row <= state.exercises.count - 1 {
+                cell.update(with: state.exercises[indexPath.row])
             }
 
-            if exercisesGlobal.count == 0 {
+            if state.exercises.count == 0 {
                 cell.update(with: "New Exercise")
             }
 
-            if exercisesGlobal.count > 0 && indexPath.row == exercisesGlobal.count {
+            if state.exercises.count > 0 && indexPath.row == state.exercises.count {
                 cell.update(with: "New Exercise")
             }
         }
@@ -109,7 +113,7 @@ class WorkoutsExercisesTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         // TODO: Refactor this.
-        if (indexPath.section == exercisesSection && exercisesGlobal.count == 0) || (indexPath.section == exercisesSection && exercisesGlobal.count > 0 && indexPath.row == exercisesGlobal.count) {
+        if (indexPath.section == exercisesSection && state.exercises.count == 0) || (indexPath.section == exercisesSection && state.exercises.count > 0 && indexPath.row == state.exercises.count) {
             return false
         } else {
             return true
@@ -120,28 +124,28 @@ class WorkoutsExercisesTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             if indexPath.section == workoutsSection {
-                enabledExercises.remove(at: indexPath.row)
-                if enabledExercises.save() {
+                state.enabledExercises.remove(at: indexPath.row)
+                if state.enabledExercises.save() {
                     tableView.deleteRows(at: [indexPath], with: .fade)
                 }
             } else {
-                let enabledExercisesToDelete = enabledExercises.filter { $0.exerciseId == exercisesGlobal[indexPath.row].id}
-                let indicesToDelete: [Int] = enabledExercisesToDelete.map { enabledExercises.index(of: $0)! }
+                let enabledExercisesToDelete = state.enabledExercises.filter { $0.exerciseId == state.exercises[indexPath.row].id}
+                let indicesToDelete: [Int] = enabledExercisesToDelete.map { state.enabledExercises.index(of: $0)! }
 
-                enabledExercises = enabledExercises.filter { $0.exerciseId != exercisesGlobal[indexPath.row].id}
-                workouts.arrange(exercises: (
+                state.enabledExercises = state.enabledExercises.filter { $0.exerciseId != state.exercises[indexPath.row].id}
+                state.workouts.arrange(exercises: (
                         exercisesUsed: [],
-                        exercisesLeft: enabledExercises
+                        exercisesLeft: state.enabledExercises
                 ))
 
-                if enabledExercises.save() {
+                if state.enabledExercises.save() {
                     let paths: [IndexPath] = indicesToDelete.map {
                         return IndexPath(row: $0, section: 0)
                     }
                     tableView.deleteRows(at: paths, with: UITableViewRowAnimation.automatic)
                 }
-                exercisesGlobal.remove(at: indexPath.row)
-                if exercisesGlobal.save() {
+                state.exercises.remove(at: indexPath.row)
+                if state.exercises.save() {
                     tableView.deleteRows(at: [indexPath], with: .fade)
                 }
                 tableView.reloadData()
@@ -161,30 +165,27 @@ class WorkoutsExercisesTableViewController: UITableViewController {
 
         switch true {
         case fromExercisesToWorkouts:
-            let exercise = exercisesGlobal[fromIndexPath.row]
-            if exercise.duration < SettingsManager().workoutDuration {
-                enabledExercises.insert(EnabledExercise(workoutId: nil, exerciseId: exercise.id!, name: exercise.name!), at: to.row)
-                workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises))
-                let _ = enabledExercises.save()
+            let exercise = state.exercises[fromIndexPath.row]
+            if exercise.duration < Int(state.settings[0].workoutDurationInSeconds) {
+                state.enabledExercises.insert(EnabledExercise(workoutId: nil, exerciseId: exercise.id!, name: exercise.name!), at: to.row)
+                state.workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: state.enabledExercises))
+                let _ = state.enabledExercises.save()
             }
         case fromExercisesToExercises:
-            let movedExercise = exercisesGlobal[fromIndexPath.row]
-            exercisesGlobal.remove(at: fromIndexPath.row)
-            exercisesGlobal.insert(movedExercise, at: to.row)
-            exercisesGlobal.save()
+            let movedExercise = state.exercises[fromIndexPath.row]
+            state.exercises.remove(at: fromIndexPath.row)
+            state.exercises.insert(movedExercise, at: to.row)
+            state.exercises.save()
         case fromWorkoutsToWorkouts:
-            let movedExercise = enabledExercises[fromIndexPath.row]
-            enabledExercises.remove(at: fromIndexPath.row)
-            enabledExercises.insert(movedExercise, at: to.row)
-            enabledExercises.save()
+            let movedExercise = state.enabledExercises[fromIndexPath.row]
+            state.enabledExercises.remove(at: fromIndexPath.row)
+            state.enabledExercises.insert(movedExercise, at: to.row)
+            state.enabledExercises.save()
 
-            workouts = []
-            workouts.save()
-            workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises))
+            state.workouts = []
+            state.workouts.save()
+            state.workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: state.enabledExercises))
 
-//                print("workouts count: \(workouts.count)")
-//                print("workouts exercises count: \(workouts[0].enabledExercises!.count)")
-//                print("workouts exercises duration: \(workouts[0].duration())")
         case fromWorkoutsToExercises:
             print("fromWorkoutsToExercises")
                 // Remove workouts[fromIndexPath.row]
@@ -201,7 +202,7 @@ class WorkoutsExercisesTableViewController: UITableViewController {
         return true
     }
 
-    @IBAction func unwindToWorkoutsExercises(segue: UIStoryboardSegue) {
-        print("unwinding")
-    }
+//    @IBAction func unwindToWorkoutsExercises(segue: UIStoryboardSegue) {
+//        print("unwinding")
+//    }
 }

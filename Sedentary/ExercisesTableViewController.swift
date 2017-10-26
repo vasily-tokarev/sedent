@@ -24,11 +24,8 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
     @IBOutlet weak var tenSecondsLeftSpeechTextField: UITextField!
     @IBOutlet weak var fiveSecondsLeftSpeechTextField: UITextField!
     @IBOutlet weak var endSpeechTextField: UITextField!
-    // TODO: Hide keyboard. Return is not going to work.
-    @IBOutlet weak var descriptionTextView: UITextView!
-
-    @IBOutlet weak var saveButton: UIButton!
-
+    @IBOutlet weak var descriptionTextField: UITextField!
+    
     @IBAction func durationStepperValueChanged(_ sender: UIStepper) {
         // TODO: Hide thirtySecondsSpeech
         let seconds = Int(durationStepper.value)
@@ -45,7 +42,7 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
         return (seconds / 3600, (seconds % 3600) / 60, (seconds % 3600) % 60)
     }
 
-    @IBAction func saveButtonTapped(_ sender: UIButton) {
+    @objc func saveButtonTapped() {
         func saveImage(image: UIImage, path: URL ) {
             let pngImageData = UIImagePNGRepresentation(image)
             //let jpgImageData = UIImageJPEGRepresentation(image, 1.0)   // if you want to save as JPEG
@@ -62,13 +59,14 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
                         tenSecondsLeft: tenSecondsLeftSpeechTextField.text,
                         fiveSecondsLeft: fiveSecondsLeftSpeechTextField.text,
                         end: endSpeechTextField.text
-                )
+                ),
+                description: descriptionTextField.text
         )
 
         if let _ = currentExercise {
-            exercisesGlobal[selectedExerciseIndex!] = exercise
+            state.exercises[selectedExerciseIndex!] = exercise
         } else {
-            exercisesGlobal.append(exercise)
+            state.exercises.append(exercise)
         }
 
         let docDir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
@@ -78,10 +76,10 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
             let _ = saveImage(image: image, path: imageURL)
         }
 
-        if exercisesGlobal.save() {
+        if state.exercises.save() {
             print("going back from ExerciseTableViewController") // This will not execute, will it?
+            performSegue(withIdentifier: Navigation.Segue.unwindToWorkoutsExercises.identifier, sender: self)
         }
-        print(exercisesGlobal.last)
     }
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -98,11 +96,23 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(imageViewTapped(tapGestureRecognizer:)))
+        imageView.isUserInteractionEnabled = true
+        imageView.addGestureRecognizer(tapGestureRecognizer)
+
+        self.tableView.separatorStyle = .none
+
+        let saveButtonItem: UIBarButtonItem = UIBarButtonItem(title: "Save", style: UIBarButtonItemStyle.plain, target: self, action: #selector(self.saveButtonTapped))
+        navigationItem.rightBarButtonItem = saveButtonItem
+
         formatDuration(value: durationStepper.value)
-        if selectedExerciseIndex != exercisesGlobal.count {
-            currentExercise = exercisesGlobal[selectedExerciseIndex!]
+        if selectedExerciseIndex != state.exercises.count {
+            currentExercise = state.exercises[selectedExerciseIndex!]
             if let exercise = currentExercise {
-                let docDir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+                guard let docDir = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true) else {
+                    print("ExercisesTableViewController: docDir is not set")
+                    return
+                }
                 let imageURL = docDir.appendingPathComponent("\(exercise.name)-\(exercise.id)-0.png")
                 if let data = try? Data(contentsOf: imageURL) {
                     imageView.image = UIImage(data: data)
@@ -117,13 +127,13 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
                 tenSecondsLeftSpeechTextField.text = exercise.speech?.tenSecondsLeft
                 fiveSecondsLeftSpeechTextField.text = exercise.speech?.fiveSecondsLeft
                 endSpeechTextField.text = exercise.speech?.end
-//                descriptionTextView.text = exercise.exerciseDescription
+                descriptionTextField.text = exercise.description
             }
         }
 
         // Hide keyboard.
-        // TODO: Refactor. Not working for description.
         nameTextField.delegate = self
+        descriptionTextField.delegate = self
         startSpeechTextField.delegate = self
         thirtySecondsLeftSpeechTextField.delegate = self
         tenSecondsLeftSpeechTextField.delegate = self
@@ -158,8 +168,8 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
         }
     }
 
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.section == imageSection {
+//    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    @objc func imageViewTapped(tapGestureRecognizer: UITapGestureRecognizer) {
             let alertController = UIAlertController(title: "Choose Image Source", message: nil, preferredStyle: .actionSheet)
             let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
             alertController.addAction(cancelAction)
@@ -167,14 +177,15 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
             let imagePicker = UIImagePickerController()
             imagePicker.delegate = self
 
-            if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                let cameraAction = UIAlertAction(title: "Camera", style: .default, handler: {
-                    action in
-                    imagePicker.sourceType = .camera
-                    self.present(imagePicker, animated: true, completion: nil)
-                })
-                alertController.addAction(cameraAction)
-            }
+//            if UIImagePickerController.isSourceTypeAvailable(.camera) {
+//                print("camera available")
+//                let cameraAction = UIAlertAction(title: "Camera", style: .default, handler: {
+//                    action in
+//                    imagePicker.sourceType = .camera
+//                    self.present(imagePicker, animated: true, completion: nil)
+//                })
+//                alertController.addAction(cameraAction)
+//            }
 
             if UIImagePickerController.isSourceTypeAvailable(.photoLibrary) {
                 let photoLibraryAction = UIAlertAction(title: "Photo Library", style: .default, handler: {
@@ -187,7 +198,6 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
 
 //            alertController.popoverPresentationController?.sourceView = sender
             present(alertController, animated: true, completion: nil)
-        }
     }
 
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {

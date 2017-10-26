@@ -10,172 +10,223 @@ import Foundation
 import AVFoundation
 import UIKit
 
-var exercisesGlobal: [Exercise] = DataManager().saved()
-var workouts: [Workout] = DataManager().saved()
-var enabledExercises: [EnabledExercise] = DataManager().saved()
-//let coach: Coach = Coach()
-
-//class NetworkController {
-//    var data: Data?
-//    let session = URLSession.shared
-//    var delegate: BoardTableViewController?
-//
-//    func fetchDoesCallSucceed(board: Item) {
-//        let task = session.dataTask(with: URL(string: board.url)!) {
-//            (data, response, error) in
-//            // TODO: Handle error response.
-//            let success = error == nil
-//            self.data = data
-//            self.delegate?.didGetResult(success)
-//        }
-//        task.resume()
-//    }
-//}
-
-
-// BoardTableViewController
-//let networkController = NetworkController()
-//var hasData: Bool = false
-//func didGetResult(_ success: Bool) {
-//    self.hasData = success
-//
-//    if let data = networkController.data {
-//        if board!.chan == ChanName.fourChan {
-//            self.fetchFourChanThreads(data: data)
-//        }
-//        if board!.chan == ChanName.dvach {
-//            self.fetchDvachThreads(data: data)
-//        }
-//    }
-//
-//    DispatchQueue.main.sync {
-//        self.tableView.reloadData()
-////            tableView.contentInset = UIEdgeInsetsMake(20.0, 0.0, 0.0, 0.0)
-//        tableView.rowHeight = UITableViewAutomaticDimension
-//        tableView.estimatedRowHeight = 120
-//    }
-//}
-//func reloadTableViewAfterNetworkCall() {
-//    messages.removeAll()
-//    self.tableView.reloadData()
-//    networkController.delegate = self
-//    networkController.fetchDoesCallSucceed(board: board!)
-//}
-
-class SettingsManager {
-    let notificationInterval: Int = 120
-    let workoutDuration: Int = 120 // or seconds?
-    let timerOffAt: Date = Date()
+enum WorkoutErrors: Error {
+    case timerNotSet
 }
 
-// I'll name you Coach!
+let coach: Coach = Coach()
+let notifications: Notifications = Notifications()
+
+class State: Codable {
+    var settings: [Settings] = DataManager().saved()
+    var exercises: [Exercise] = DataManager().saved()
+    var workouts: [Workout] = DataManager().saved()
+    var enabledExercises: [EnabledExercise] = DataManager().saved()
+}
+
+var state = State()
+
+func firstRun() {
+    if state.settings.count == 0 {
+        state.settings = []
+//        state.settings.append(Settings(notificationInterval: 40.0, workoutDuration: 2.0, notificationText: "It is time to move!", autostart: false))
+        state.settings.append(Settings(notificationInterval: 1.0, workoutDuration: 2.0, notificationText: "It is time to move!", autostart: false))
+        state.settings.save()
+    }
+}
+
+class Settings: Codable {
+    var notificationInterval: Double
+    var workoutDuration: Double
+    var autostart: Bool
+    var notificationText: String
+//    let timerOffAt: Date = Date() // Do I need it really?
+    var notificationIntervalInSeconds: Double {
+        return self.notificationInterval * 60
+    }
+    var workoutDurationInSeconds: Int {
+        return Int(self.workoutDuration * 60)
+    }
+
+    init(notificationInterval: Double, workoutDuration: Double, notificationText: String, autostart: Bool) {
+        self.notificationInterval = notificationInterval
+        self.workoutDuration = workoutDuration
+        self.notificationText = notificationText
+        self.autostart = autostart
+    }
+}
+
 class Coach {
+    var delegate: CoachViewController?
+    var mainViewDelegate: ViewController?
     let speechSynthesizer: AVSpeechSynthesizer = AVSpeechSynthesizer()
-//    var workouts: [Workout] = []
     var exercises: [Exercise] = []
-    var delegate: ExerciseViewController?
-//    var exerciseTimer: Timer = Timer()
+    var workouts: [Workout] = []
     var currentExercise: Exercise?
+    var currentWorkout: Workout?
+    var totalDuration: Int?
+//    var durationLeft: Int?
 
-    func dispatchSpeaker(say speech: String, seconds: Int = 0) {
+    var timer: Timer?
+    var exerciseStarted: Date?
+
+    func speaker(say speech: String) {
         let speech = AVSpeechUtterance(string: speech)
-        if seconds == 0 {
-            DispatchQueue.main.async(execute: {
-                self.speechSynthesizer.speak(speech)
-            })
+        DispatchQueue.main.async(execute: {
+            self.speechSynthesizer.speak(speech)
+        })
+    }
+
+    func stop() throws {
+        // https://stackoverflow.com/questions/44633729/stop-a-dispatchqueue-that-is-running-on-the-main-thread
+        print("stopping workout")
+
+        guard let timer = timer else {
+            print("Workout: timer is not set")
+            throw WorkoutErrors.timerNotSet
+            return
+        }
+
+        timer.invalidate()
+    }
+
+    func start(exercise: Exercise? = nil) {
+        notifications.center.removeAllDeliveredNotifications()
+        state.workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: state.enabledExercises))
+        self.workouts = state.workouts
+        print("state.workouts.count: \(state.workouts.count)")
+        guard self.workouts.count > 0 else {
+            print("There are no workouts")
+            // Remove the text, add "You have no workouts available" to the exercise name.
+            return
+        }
+
+        currentWorkout = self.workouts.next
+        if exercise == nil {
+            currentExercise = currentWorkout?.exercises.first
+//            durationLeft = currentWorkout!.exercises.duration
+            totalDuration = currentWorkout?.exercises.duration
+        }
+
+        guard currentExercise != nil else {
+            print("currentExercise is not set")
+            return
+        }
+
+        print("currentWorkout!.exercises.count: \(currentWorkout?.exercises.count)")
+
+        self.startTimer()
+
+//        self.delegate!.exerciseChanged()
+//        durationLeft! -= currentExercise!.duration
+    }
+
+    @objc func updateTimer() {
+        print("updating timer")
+        print("currentExercise: \(self.currentExercise)")
+        print("currentExercise duration: \(self.currentExercise!.duration)")
+        let timeInterval = self.currentExercise!.duration
+        print("timerInterval")
+//        let timeInterval = 6
+
+        let secondsSinceNotificationCreated = Date().timeIntervalSince(exerciseStarted!)
+        let secondsLeft = (Int(timeInterval) - Int(secondsSinceNotificationCreated)) % 60
+        let minutesLeft = ((Int(timeInterval) - Int(secondsSinceNotificationCreated)) / 60)
+//        print(String(format: "%02i:%02i", Int(minutesLeft), Int(secondsLeft)))
+
+        print("seconds set")
+
+        if secondsLeft < 0 {
+            self.delegate!.updateLabel(with: "0:00")
         } else {
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(seconds), execute: {
-                print("speaking seconds: \(seconds)")
-                self.speechSynthesizer.speak(speech)
-            })
+            self.delegate!.updateLabel(with: String(format: "%02i:%02i", Int(minutesLeft), Int(secondsLeft)))
+        }
+
+        func doNothing() {}
+
+        print("timerInterval: \(timeInterval)")
+        print("secondsLeft: \(secondsLeft)")
+        switch secondsLeft {
+        case timeInterval - 1:
+            speaker(say: currentExercise!.speech!.start!)
+        case 30:
+            speaker(say: currentExercise!.speech!.thirtySecondsLeft!)
+        case 10:
+            speaker(say: currentExercise!.speech!.tenSecondsLeft!)
+        case 5:
+            speaker(say: currentExercise!.speech!.fiveSecondsLeft!)
+        case 0:
+            speaker(say: currentExercise!.speech!.end!)
+        default:
+            doNothing()
+        }
+
+        if Int(secondsSinceNotificationCreated) > timeInterval {
+            if currentWorkout!.exercises.last == currentExercise {
+                print("last exercise")
+                // if exercise is last - segue back (delegate)
+                self.timer!.invalidate()
+                delegate?.performSegueToReturnBack()
+                mainViewDelegate?.workoutCompleted = true
+            } else {
+                print("starting timer once again")
+                let index = currentWorkout!.exercises.index(of: currentExercise!)!
+                currentExercise = currentWorkout!.exercises[index+1]
+
+                exerciseStarted = Date()
+                self.startTimer()
+            }
         }
     }
 
-    func startWorkout() {
-//        guard workouts.count > 0 else {
-//            print("There are no workouts")
-//            return
-//        }
-        workouts = []
-        workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises))
-        let workout = workouts.first
-        let exercise = workout!.exercises.first
-        currentExercise = exercise
-        print("delegate!")
-        if let delegate = self.delegate {
-            print("delegate success")
-            self.delegate!.startTimer()
-        }
-        print("startTimer()")
-//        self.startTimer()
-        dispatchSpeaker(say: "Exercise started")
-        dispatchSpeaker(say: "30 seconds left", seconds: exercise!.duration - 30)
-        dispatchSpeaker(say: "10 seconds left", seconds: exercise!.duration - 10)
-        dispatchSpeaker(say: "5 seconds left", seconds: exercise!.duration - 5)
-        dispatchSpeaker(say: "Exercise ended", seconds: exercise!.duration)
-
-//        dispatchSpeaker(say: "30 seconds left", seconds: (exercise.duration - (exercise.duration / (exercise.duration / workout!.reminder))) + duration)
-
-//        let lastExerciseId = workout!.exercises.last!.id
-//        _ = workout!.exercises.reduce(0, { duration, exercise in
-//            dispatchSpeaker(say: exercise.speech!.start!, seconds: duration) // 0, 6
-//            if exercise.id == lastExerciseId {
-//                dispatchSpeaker(say: "Back to work", seconds: duration + exercise.duration)
-//            }
-//            return duration + exercise.duration
-//        })
+    func startTimer() {
+        if self.timer != nil {
+            self.timer!.invalidate()
+        } // or just invalidate it in any case?
+        self.timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateTimer), userInfo: nil, repeats: true)
     }
 
-//    func startTimer() {
-//        exerciseTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(ExerciseViewController.updateTimer), userInfo: nil, repeats: true)
-//    }
-
-//    func restartTimer() {
-//        exerciseTimer.invalidate()
-//        startTimer()
-//    }
-
-//    @objc func updateTimer() {
-//        let secondsSinceNotificationCreated = Date().timeIntervalSince(dateNotificationCreated!)
-//        let secondsLeft = (Int(timeInterval) - Int(secondsSinceNotificationCreated)) % 60
-//        let minutesLeft = ((Int(timeInterval) - Int(secondsSinceNotificationCreated)) / 60)
-//        exerciseTimerLabel.text = String(format: "%02i:%02i", Int(minutesLeft), Int(secondsLeft))
-//        if secondsSinceNotificationCreated > timeInterval {
-//            exerciseTimer.invalidate()
-//            startButton.isEnabled = true
-//        }
-//    }
+    init() {
+//        workouts = []
+//        state.workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: state.enabledExercises))
+//        self.workouts = state.workouts
+//        print("state.workouts.count: \(state.workouts.count)")
+        exerciseStarted = Date()
+    }
 }
 
-class Exercise: Codable {
-    let savePath: String = "exercises"
+class Exercise: Codable, Equatable {
     let id: Int?
     var name: String? = "Exercise"
     var duration: Int = 60
 //    var image: UIImage? = nil
     var speech: Speech?
+    var description: String?
 
-    var description: String {
-        return "Exercise: #\(self.id) - \(self.name)"
-    }
-
-    init(id: Int? = nil, name: String? = nil, duration: Int? = nil, speech: Speech? = nil) {
-        if exercisesGlobal.count > 0 {
-            self.id = exercisesGlobal.count + 1
+    init(id: Int? = nil, name: String? = nil, duration: Int? = nil, speech: Speech? = nil, description: String? = "") {
+        if state.exercises.count > 0 {
+            self.id = state.exercises.count + 1
         } else {
             self.id = 0
         }
-        
+
         self.name = name
 
         if let duration = duration {
             self.duration = duration
         }
-//        self.duration = duration ?? duration!
 
         if let speech = speech {
             self.speech = speech
         }
+
+        if let description = description {
+            self.description = description
+        }
+    }
+
+    static func == (lhs: Exercise, rhs: Exercise) -> Bool{
+        return lhs.id == rhs.id
     }
 
     struct Speech: Codable {
@@ -185,7 +236,7 @@ class Exercise: Codable {
         var fiveSecondsLeft: String?
         var end: String?
 
-        init(start: String? = nil, thirtySecondsLeft: String? = nil, tenSecondsLeft: String? = nil, fiveSecondsLeft: String? = nil, end: String? = nil) {
+        init(start: String? = "", thirtySecondsLeft: String? = "", tenSecondsLeft: String? = "", fiveSecondsLeft: String? = "", end: String? = "") {
             self.start = start
             self.thirtySecondsLeft = thirtySecondsLeft
             self.tenSecondsLeft = tenSecondsLeft
@@ -193,8 +244,6 @@ class Exercise: Codable {
             self.end = end
         }
     }
-    // Add `remove` extension which removes both from `exercises` and data (DataManager).
-    // https://stackoverflow.com/questions/24938948/array-extension-to-remove-object-by-value
 }
 
 struct DataManager<Element> {
@@ -207,7 +256,8 @@ struct DataManager<Element> {
         switch Element.self {
         case is Exercise.Type: pathString = "exercises"
         case is Workout.Type: pathString = "workouts"
-        case is EnabledExercise.Type: pathString = "enabledExercises"
+        case is EnabledExercise.Type: pathString = "enabled_exercises"
+        case is Settings.Type: pathString = "user_settings"
         default: print("DataManager: No such type.")
         }
         return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -216,9 +266,9 @@ struct DataManager<Element> {
 
     func saved() -> [Element] {
         var data: [Element] = []
-        if let retrievedExercisesData = try? Data(contentsOf: dataURL),
+        if let retrievedData = try? Data(contentsOf: dataURL),
            let decodedData = try?
-           propertyListDecoder.decode([Element].self, from: retrievedExercisesData) {
+           propertyListDecoder.decode([Element].self, from: retrievedData) {
             data = decodedData
         }
         return data
@@ -242,21 +292,41 @@ struct DataManager<Element> {
     }
 }
 
+extension Array where Element: Settings {
+    private var manager: DataManager<Settings> { return DataManager() }
+
+    var saved: [Settings] {
+        state.settings = manager.saved()
+        return state.settings
+    }
+
+    func save() -> Bool {
+        state.settings = self
+        return manager.save(data: self)
+    }
+}
+
 extension Array where Element: Exercise {
     private var manager: DataManager<Exercise> { return DataManager() }
 
     var saved: [Exercise] {
-        exercisesGlobal = manager.saved()
-        return exercisesGlobal
+        state.exercises = manager.saved()
+        return state.exercises
     }
 
     func save() -> Bool {
-        exercisesGlobal = self
+        state.exercises = self
         return manager.save(data: self)
     }
 
     func findBy(id: Int) -> Exercise {
         return self.filter { $0.id == id }[0]
+    }
+
+    var duration: Int {
+        return self.reduce(0, { duration, exercise in
+            return exercise.duration + duration
+        })
     }
 }
 
@@ -264,19 +334,19 @@ extension Array where Element: EnabledExercise {
     private var manager: DataManager<EnabledExercise> { return DataManager() }
 
     var saved: [EnabledExercise] {
-        enabledExercises = manager.saved()
-        return enabledExercises
+        state.enabledExercises = manager.saved()
+        return state.enabledExercises
     }
 
     func save() -> Bool {
-        enabledExercises = self
+        state.enabledExercises = self
         return manager.save(data: self)
     }
 
 //    func delete(exercise: Exercise) -> [EnabledExercise] {
-//        enabledExercises = enabledExercises.filter { $0.exerciseId != exercise.id}
-//        workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: enabledExercises)) // Add a typealias for this.
-//        return enabledExercises
+//        state.enabledExercises = state.enabledExercises.filter { $0.exerciseId != exercise.id}
+//        workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: state.enabledExercises)) // Add a typealias for this.
+//        return state.enabledExercises
 //    }
 }
 
@@ -285,13 +355,15 @@ typealias SortedExercisesTuple = (exercisesUsed: [EnabledExercise], exercisesLef
 extension Array where Element: Workout {
     private var manager: DataManager<Workout> { return DataManager() }
 
+    var next: Workout { return self.filter { $0.next == true }[0] }
+
     var saved: [Workout] {
-        workouts = manager.saved()
-        return workouts
+        state.workouts = manager.saved()
+        return state.workouts
     }
 
     func save() -> Bool {
-        workouts = self
+        state.workouts = self
         return manager.save(data: self)
     }
 
@@ -299,8 +371,11 @@ extension Array where Element: Workout {
         return self.filter { $0.id == id }[0]
     }
 
+
+
     func arrange(exercises: SortedExercisesTuple) {
-        var duration = SettingsManager().workoutDuration
+        // Might recurse if duration is too small.
+        var duration = Int(state.settings[0].workoutDurationInSeconds)
 
         func sortExercises(exercises: SortedExercisesTuple) -> SortedExercisesTuple {
             var sortedExercises: SortedExercisesTuple = (exercisesUsed: [], exercisesLeft: [])
@@ -316,11 +391,11 @@ extension Array where Element: Workout {
         }
 
         let sortedExercises = sortExercises(exercises: (exercisesUsed: [], exercisesLeft: exercises.exercisesLeft))
-        workouts.append(Workout(next: true, enabledExercises: sortedExercises.exercisesUsed))
+        state.workouts.append(Workout(next: true, enabledExercises: sortedExercises.exercisesUsed))
         if sortedExercises.exercisesLeft.count > 0 {
-            workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: sortedExercises.exercisesLeft))
+            state.workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: sortedExercises.exercisesLeft))
         } else {
-            workouts.save()
+            state.workouts.save()
         }
     }
 }
@@ -347,7 +422,7 @@ class EnabledExercise: Codable, Equatable {
     let exerciseId: Int
     var workoutId: Int?
     let name: String
-    var duration: Int { return exercisesGlobal.filter { $0.id == exerciseId
+    var duration: Int { return state.exercises.filter { $0.id == exerciseId
     }[0].duration }
 
     init(workoutId: Int?, exerciseId: Int, name: String) {
@@ -356,7 +431,7 @@ class EnabledExercise: Codable, Equatable {
             self.workoutId = workoutId
         }
         self.name = name
-        self.id = enabledExercises.count + 1
+        self.id = state.enabledExercises.count + 1
     }
 
     static func == (lhs: EnabledExercise, rhs: EnabledExercise) -> Bool{
@@ -370,13 +445,21 @@ class Workout: Codable {
 //    var timeAt: Date
     var enabledExercises: [EnabledExercise]?
     var exercises: [Exercise] {
-        return exercisesGlobal.filter { exercise in
+        return state.exercises.filter { exercise in
             return self.enabledExercises!.contains { enabledExercise in
                 return enabledExercise.exerciseId == exercise.id
             }
         }
     }
     let reminder: Int = testMode ? 3 : 30 // delete
+
+    var duration: Int {
+        return self.enabledExercises!.reduce(0, { duration, enabledExercise in
+            let exercise = exercises.filter { $0.id == enabledExercise.exerciseId
+            }[0]
+            return exercise.duration + duration
+        })
+    }
 
     var description: String {
         return "Workout: #\(self.id), next?: \(self.next), exercises.count: \(self.exercises.count), enabledExercises.count: \(self.enabledExercises!.count)"
@@ -385,28 +468,25 @@ class Workout: Codable {
 //    let delayBeforeExercise: Int = 1
 //    var count: Int = 0
 
-    func duration() -> Int {
-        return self.enabledExercises!.reduce(0, { duration, enabledExercise in
-            let exercise = exercises.filter { $0.id == enabledExercise.exerciseId
-            }[0]
-            return exercise.duration + duration
-        })
-    }
+//    func duration() -> Int {
+//        return self.enabledExercises!.reduce(0, { duration, enabledExercise in
+//            let exercise = exercises.filter { $0.id == enabledExercise.exerciseId
+//            }[0]
+//            return exercise.duration + duration
+//        })
+//    }
 
     init(next: Bool, enabledExercises: [EnabledExercise]) {
         // https://stackoverflow.com/questions/32332985/how-to-use-audio-in-ios-application-with-swift-2
         self.next = next
         self.enabledExercises = enabledExercises
 //        self.exercises = exercises
-        self.id = workouts.count + 1
+        self.id = state.workouts.count + 1
 
         self.enabledExercises!.forEach { exercise in
             exercise.workoutId = self.id
         }
 
-    }
-
-    func start() {
     }
 }
 
