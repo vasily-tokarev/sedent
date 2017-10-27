@@ -22,6 +22,8 @@ class CoachViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        UIApplication.shared.isIdleTimerDisabled = true // Disable it for other views?
+
         dateNotificationCreated = Date()
         coach.coachViewDelegate = self
         print("refreshing")
