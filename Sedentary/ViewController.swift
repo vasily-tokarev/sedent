@@ -23,8 +23,10 @@ class ViewController: UIViewController {
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // TODO: Check the destination.
+        print("segue 1")
         let coachVC = segue.destination as? CoachViewController
         coachVC?.delegate = self
+        print("segue 2")
     }
 
     @IBAction func unwindToMain(segue: UIStoryboardSegue) {

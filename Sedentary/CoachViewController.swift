@@ -12,7 +12,8 @@ class CoachViewController: UIViewController {
     @IBOutlet weak var exerciseTimerLabel: UILabel!
     @IBOutlet weak var exerciseNameLabel: UILabel!
     @IBOutlet weak var exerciseImageView: UIImageView!
-
+    @IBOutlet weak var exerciseDescriptionTextView: UITextView!
+    
     let coach: Coach = Coach()
     var dateNotificationCreated: Date?
     var exerciseTimer: Timer?
@@ -23,9 +24,13 @@ class CoachViewController: UIViewController {
 
         dateNotificationCreated = Date()
         coach.coachViewDelegate = self
+        print("refreshing")
         state.workouts.refresh()
+        print("refreshed")
         coach.start(workout: state.workouts.first!)
-        updateExerciseName()
+        print("starting")
+        updateView()
+        print("updating view")
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -45,12 +50,25 @@ class CoachViewController: UIViewController {
         }
     }
 
-    func updateExerciseName() {
+    func updateView() {
         exerciseNameLabel.text = coach.currentExercise.name
+        exerciseDescriptionTextView.text = coach.currentExercise.description
+
+        let docDir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+        let imageURL = docDir.appendingPathComponent("\(coach.currentExercise.name)-\(coach.currentExercise.id)-0.png")
+//        let imageURL = "\(coach.currentExercise.name)-\(coach.currentExercise.id)-0.png"
+
+        if let data = try? Data(contentsOf: imageURL) {
+            exerciseImageView.image = UIImage(data: data)
+        }
+
+//        if let image = UIImage(contentsOfFile: imageURL) {
+//            exerciseImageView.image = image
+//        }
     }
 
     func exerciseChanged() {
-        updateExerciseName()
+        updateView()
         dateNotificationCreated = Date()
     }
 

@@ -174,7 +174,11 @@ class Coach {
     }
 
     init() {
-        self.workout = state.workouts.next
+        print("init")
+//        self.workout = state.workouts.next
+        state.workouts.refresh()
+        self.workout = state.workouts.first!
+        print("init 1")
         if let currentExercise = self.workout.exercises.first {
             self.currentExercise = currentExercise
         } else {
@@ -214,7 +218,7 @@ class Exercise: Codable, Equatable {
         }
     }
 
-    static func == (lhs: Exercise, rhs: Exercise) -> Bool{
+    static func == (lhs: Exercise, rhs: Exercise) -> Bool {
         return lhs.id == rhs.id
     }
 
