@@ -13,17 +13,18 @@ class CoachViewController: UIViewController {
     @IBOutlet weak var exerciseNameLabel: UILabel!
     @IBOutlet weak var exerciseImageView: UIImageView!
 
-//    let coach: Coach = state.coach
+    let coach: Coach = Coach()
     var dateNotificationCreated: Date?
-//    var exerciseTimer: Timer = Timer()
     var exerciseTimer: Timer?
+    var delegate: ViewController?
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         dateNotificationCreated = Date()
-        coach.delegate = self
-        coach.start()
+        coach.coachViewDelegate = self
+        state.workouts.refresh()
+        coach.start(workout: state.workouts.first!)
         updateExerciseName()
     }
 
@@ -38,15 +39,14 @@ class CoachViewController: UIViewController {
 
     func performSegueToReturnBack()  {
         // Pass workout complete to main view and restart the timer.
+        delegate?.workoutCompleted = true
         if let nav = self.navigationController {
             nav.popViewController(animated: true)
-        } else {
-            self.dismiss(animated: true, completion: nil)
         }
     }
 
     func updateExerciseName() {
-        exerciseNameLabel.text = coach.currentExercise?.name
+        exerciseNameLabel.text = coach.currentExercise.name
     }
 
     func exerciseChanged() {
@@ -60,14 +60,13 @@ class CoachViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-//        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor:UIColor.white]
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
+
 
     /*
     // MARK: - Navigation

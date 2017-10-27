@@ -133,10 +133,6 @@ class WorkoutsExercisesTableViewController: UITableViewController {
                 let indicesToDelete: [Int] = enabledExercisesToDelete.map { state.enabledExercises.index(of: $0)! }
 
                 state.enabledExercises = state.enabledExercises.filter { $0.exerciseId != state.exercises[indexPath.row].id}
-                state.workouts.arrange(exercises: (
-                        exercisesUsed: [],
-                        exercisesLeft: state.enabledExercises
-                ))
 
                 if state.enabledExercises.save() {
                     let paths: [IndexPath] = indicesToDelete.map {
@@ -149,6 +145,7 @@ class WorkoutsExercisesTableViewController: UITableViewController {
                     tableView.deleteRows(at: [indexPath], with: .fade)
                 }
                 tableView.reloadData()
+                state.workouts.refresh()
             }
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
@@ -168,7 +165,6 @@ class WorkoutsExercisesTableViewController: UITableViewController {
             let exercise = state.exercises[fromIndexPath.row]
             if exercise.duration < Int(state.settings[0].workoutDurationInSeconds) {
                 state.enabledExercises.insert(EnabledExercise(workoutId: nil, exerciseId: exercise.id!, name: exercise.name!), at: to.row)
-                state.workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: state.enabledExercises))
                 let _ = state.enabledExercises.save()
             }
         case fromExercisesToExercises:
@@ -181,11 +177,6 @@ class WorkoutsExercisesTableViewController: UITableViewController {
             state.enabledExercises.remove(at: fromIndexPath.row)
             state.enabledExercises.insert(movedExercise, at: to.row)
             state.enabledExercises.save()
-
-            state.workouts = []
-            state.workouts.save()
-            state.workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: state.enabledExercises))
-
         case fromWorkoutsToExercises:
             print("fromWorkoutsToExercises")
                 // Remove workouts[fromIndexPath.row]
@@ -193,7 +184,7 @@ class WorkoutsExercisesTableViewController: UITableViewController {
             print("default")
         }
 
-        tableView.reloadData() // Remove it after arrange() is implemented.
+        tableView.reloadData() // TODO: Is this required?
     }
 
     // Override to support conditional rearranging of the table view.

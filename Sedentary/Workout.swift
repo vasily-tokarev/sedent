@@ -14,7 +14,6 @@ enum WorkoutErrors: Error {
     case timerNotSet
 }
 
-let coach: Coach = Coach()
 let notifications: Notifications = Notifications()
 
 class State: Codable {
@@ -30,7 +29,7 @@ func firstRun() {
     if state.settings.count == 0 {
         state.settings = []
 //        state.settings.append(Settings(notificationInterval: 40.0, workoutDuration: 2.0, notificationText: "It is time to move!", autostart: false))
-        state.settings.append(Settings(notificationInterval: 1.0, workoutDuration: 2.0, notificationText: "It is time to move!", autostart: false))
+        state.settings.append(Settings(notificationInterval: 0.2, workoutDuration: 2.0, notificationText: "It is time to move!", autostart: false))
         state.settings.save()
     }
 }
@@ -57,13 +56,16 @@ class Settings: Codable {
 }
 
 class Coach {
-    var delegate: CoachViewController?
+    var coachViewDelegate: CoachViewController?
     var mainViewDelegate: ViewController?
     let speechSynthesizer: AVSpeechSynthesizer = AVSpeechSynthesizer()
-    var exercises: [Exercise] = []
-    var workouts: [Workout] = []
-    var currentExercise: Exercise?
-    var currentWorkout: Workout?
+    var exercises: [Exercise] { return workout.exercises }
+    var currentExercise: Exercise
+    var currentExerciseIndex: Int { return workout.exercises.index(of: currentExercise)! }
+//    var currentExerciseDuration: Int { return currentExercise.duration }
+    var currentExerciseDuration: Int { return 3 }
+    var secondsSinceExerciseStarted: Int { return Int(Date().timeIntervalSince(exerciseStarted!)) }
+    var workout: Workout
     var totalDuration: Int?
 //    var durationLeft: Int?
 
@@ -84,97 +86,82 @@ class Coach {
         guard let timer = timer else {
             print("Workout: timer is not set")
             throw WorkoutErrors.timerNotSet
-            return
         }
 
         timer.invalidate()
     }
 
-    func start(exercise: Exercise? = nil) {
+    func start(workout: Workout) {
         notifications.center.removeAllDeliveredNotifications()
-        state.workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: state.enabledExercises))
-        self.workouts = state.workouts
-        print("state.workouts.count: \(state.workouts.count)")
-        guard self.workouts.count > 0 else {
-            print("There are no workouts")
-            // Remove the text, add "You have no workouts available" to the exercise name.
-            return
-        }
 
-        currentWorkout = self.workouts.next
-        if exercise == nil {
-            currentExercise = currentWorkout?.exercises.first
-//            durationLeft = currentWorkout!.exercises.duration
-            totalDuration = currentWorkout?.exercises.duration
-        }
+//        exercises = workout.exercises.reversed()
+        print("workout.description: \(workout.description)")
+        print("exercises.count: \(exercises.count)")
 
-        guard currentExercise != nil else {
+        guard let currentExercise = exercises.first else {
             print("currentExercise is not set")
+            print("workout: \(workout)")
+            print("workout.exercises.count: \(workout.exercises.count)")
             return
         }
 
-        print("currentWorkout!.exercises.count: \(currentWorkout?.exercises.count)")
+
+        totalDuration = exercises.duration
+
+        exercises.forEach { e in
+            print("e.id: \(e.id)")
+            print("e.name: \(e.name)")
+        }
+        print("currentExercise.name: \(currentExercise.name)")
 
         self.startTimer()
-
-//        self.delegate!.exerciseChanged()
-//        durationLeft! -= currentExercise!.duration
+        speaker(say: currentExercise.speech!.start!)
+        exerciseStarted = Date()
     }
 
     @objc func updateTimer() {
-        print("updating timer")
-        print("currentExercise: \(self.currentExercise)")
-        print("currentExercise duration: \(self.currentExercise!.duration)")
-        let timeInterval = self.currentExercise!.duration
-        print("timerInterval")
-//        let timeInterval = 6
-
-        let secondsSinceNotificationCreated = Date().timeIntervalSince(exerciseStarted!)
-        let secondsLeft = (Int(timeInterval) - Int(secondsSinceNotificationCreated)) % 60
-        let minutesLeft = ((Int(timeInterval) - Int(secondsSinceNotificationCreated)) / 60)
-//        print(String(format: "%02i:%02i", Int(minutesLeft), Int(secondsLeft)))
-
-        print("seconds set")
+        guard let exerciseStarted = exerciseStarted else {
+            print("Coach.updateTimer(): exerciseStarted is not set.")
+            return
+        }
+        let secondsLeft = (currentExerciseDuration - secondsSinceExerciseStarted) % 60
+        let minutesLeft = ((currentExerciseDuration - secondsSinceExerciseStarted) / 60)
 
         if secondsLeft < 0 {
-            self.delegate!.updateLabel(with: "0:00")
+            self.coachViewDelegate!.updateLabel(with: "0:00")
         } else {
-            self.delegate!.updateLabel(with: String(format: "%02i:%02i", Int(minutesLeft), Int(secondsLeft)))
+            self.coachViewDelegate!.updateLabel(with: String(format: "%02i:%02i", Int(minutesLeft), Int(secondsLeft)))
         }
 
-        func doNothing() {}
+//        switch secondsLeft {
+//        case 30:
+//            speaker(say: currentExercise.speech!.thirtySecondsLeft!)
+//        case 10:
+//            speaker(say: currentExercise.speech!.tenSecondsLeft!)
+//        case 5:
+//            speaker(say: currentExercise.speech!.fiveSecondsLeft!)
+//        case 0:
+//            speaker(say: currentExercise.speech!.end!)
+//        default:
+//            break
+//        }
 
-        print("timerInterval: \(timeInterval)")
-        print("secondsLeft: \(secondsLeft)")
-        switch secondsLeft {
-        case timeInterval - 1:
-            speaker(say: currentExercise!.speech!.start!)
-        case 30:
-            speaker(say: currentExercise!.speech!.thirtySecondsLeft!)
-        case 10:
-            speaker(say: currentExercise!.speech!.tenSecondsLeft!)
-        case 5:
-            speaker(say: currentExercise!.speech!.fiveSecondsLeft!)
-        case 0:
-            speaker(say: currentExercise!.speech!.end!)
-        default:
-            doNothing()
-        }
-
-        if Int(secondsSinceNotificationCreated) > timeInterval {
-            if currentWorkout!.exercises.last == currentExercise {
-                print("last exercise")
-                // if exercise is last - segue back (delegate)
+        if Int(secondsSinceExerciseStarted) > currentExerciseDuration {
+            // Time is up, complete the exercise.
+            if currentExercise == workout.exercises.last {
+                // perform last one and quit
                 self.timer!.invalidate()
-                delegate?.performSegueToReturnBack()
-                mainViewDelegate?.workoutCompleted = true
+                coachViewDelegate?.performSegueToReturnBack()
+//                mainViewDelegate?.workoutCompleted = true
             } else {
-                print("starting timer once again")
-                let index = currentWorkout!.exercises.index(of: currentExercise!)!
-                currentExercise = currentWorkout!.exercises[index+1]
+                self.currentExercise = workout.exercises[self.currentExerciseIndex+1]
+                coachViewDelegate!.exerciseChanged()
+                self.exerciseStarted = Date()
+                print(Int(Date().timeIntervalSince(exerciseStarted)))
 
-                exerciseStarted = Date()
+                self.timer!.invalidate()
                 self.startTimer()
+//                speaker(say: currentExercise.speech!.start!)
             }
         }
     }
@@ -187,11 +174,13 @@ class Coach {
     }
 
     init() {
-//        workouts = []
-//        state.workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: state.enabledExercises))
-//        self.workouts = state.workouts
-//        print("state.workouts.count: \(state.workouts.count)")
-        exerciseStarted = Date()
+        self.workout = state.workouts.next
+        if let currentExercise = self.workout.exercises.first {
+            self.currentExercise = currentExercise
+        } else {
+            print("Coach init failed: currentExercise is not set")
+            self.currentExercise = Exercise()
+        }
     }
 }
 
@@ -340,6 +329,9 @@ extension Array where Element: EnabledExercise {
 
     func save() -> Bool {
         state.enabledExercises = self
+        state.workouts = []
+        state.workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: self))
+        // Less code vs exlicity?
         return manager.save(data: self)
     }
 
@@ -371,9 +363,11 @@ extension Array where Element: Workout {
         return self.filter { $0.id == id }[0]
     }
 
+    func refresh() {
+        self.arrange(exercises: (exercisesUsed: [], exercisesLeft: state.enabledExercises))
+    }
 
-
-    func arrange(exercises: SortedExercisesTuple) {
+    private func arrange(exercises: SortedExercisesTuple) {
         // Might recurse if duration is too small.
         var duration = Int(state.settings[0].workoutDurationInSeconds)
 
@@ -442,12 +436,11 @@ class EnabledExercise: Codable, Equatable {
 class Workout: Codable {
     let id: Int
     var next: Bool = false
-//    var timeAt: Date
     var enabledExercises: [EnabledExercise]?
     var exercises: [Exercise] {
-        return state.exercises.filter { exercise in
-            return self.enabledExercises!.contains { enabledExercise in
-                return enabledExercise.exerciseId == exercise.id
+        return self.enabledExercises!.flatMap { enabledExercise in
+            return state.exercises.filter { exercise in
+                return exercise.id == enabledExercise.exerciseId
             }
         }
     }
@@ -464,17 +457,6 @@ class Workout: Codable {
     var description: String {
         return "Workout: #\(self.id), next?: \(self.next), exercises.count: \(self.exercises.count), enabledExercises.count: \(self.enabledExercises!.count)"
     }
-
-//    let delayBeforeExercise: Int = 1
-//    var count: Int = 0
-
-//    func duration() -> Int {
-//        return self.enabledExercises!.reduce(0, { duration, enabledExercise in
-//            let exercise = exercises.filter { $0.id == enabledExercise.exerciseId
-//            }[0]
-//            return exercise.duration + duration
-//        })
-//    }
 
     init(next: Bool, enabledExercises: [EnabledExercise]) {
         // https://stackoverflow.com/questions/32332985/how-to-use-audio-in-ios-application-with-swift-2

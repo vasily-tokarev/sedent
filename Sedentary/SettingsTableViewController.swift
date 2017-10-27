@@ -25,6 +25,7 @@ class SettingsTableViewController: UITableViewController {
         // https://medium.com/yay-its-erica/how-to-pass-data-in-an-unwind-segue-swift-3-1c3fa095cde1
         state.settings[0] = settings
         let _ = state.settings.save()
+        state.workouts.refresh()
     }
     
     @IBAction func notificationIntervalStepperValueChanged(_ sender: UIStepper) {

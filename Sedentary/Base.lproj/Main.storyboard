@@ -19,14 +19,13 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="G0n-oN-xz6">
-                                <rect key="frame" x="14.5" y="72" width="291" height="120.5"/>
+                                <rect key="frame" x="14.5" y="72" width="291" height="119.5"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="100"/>
                                 <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
-                                <color key="shadowColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="l2K-GO-aME">
-                                <rect key="frame" x="70" y="334.5" width="180" height="108"/>
+                                <rect key="frame" x="70" y="333.5" width="180" height="108"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="80"/>
                                 <state key="normal" title="Start">
                                     <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
@@ -38,13 +37,13 @@
                                 </connections>
                             </button>
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="epV-MM-7do">
-                                <rect key="frame" x="135.5" y="217.5" width="51" height="31"/>
+                                <rect key="frame" x="135.5" y="216.5" width="51" height="31"/>
                                 <connections>
                                     <action selector="exerciseNotificationSwitchValueChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="S59-uQ-aTR"/>
                                 </connections>
                             </switch>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JEw-OR-DW9">
-                                <rect key="frame" x="74.5" y="273.5" width="171" height="36"/>
+                                <rect key="frame" x="74.5" y="272.5" width="171" height="36"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
                                 <state key="normal" title="Manage Workouts">
                                     <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
