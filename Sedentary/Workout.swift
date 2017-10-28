@@ -29,13 +29,15 @@ func firstRun() {
     if state.settings.count == 0 {
         state.settings = []
 //        state.settings.append(Settings(notificationInterval: 40.0, workoutDuration: 2.0, notificationText: "It is time to move!", autostart: false))
-        state.settings.append(Settings(notificationInterval: 0.2, workoutDuration: 2.0, notificationText: "It is time to move!", autostart: false))
-        state.settings.save()
+        state.settings.append(Settings(notificationInterval: 0.2, workoutDuration: 2.0, notificationText: "It is time to move!", autostart: false, dateNotificationCreated: Date(), notificationSwitchIsOn: false))
+        let _ = state.settings.save()
     }
 }
 
 class Settings: Codable {
     var notificationInterval: Double
+    var dateNotificationCreated: Date
+    var notificationSwitchIsOn: Bool
     var workoutDuration: Double
     var autostart: Bool
     var notificationText: String
@@ -47,11 +49,13 @@ class Settings: Codable {
         return Int(self.workoutDuration * 60)
     }
 
-    init(notificationInterval: Double, workoutDuration: Double, notificationText: String, autostart: Bool) {
+    init(notificationInterval: Double, workoutDuration: Double, notificationText: String, autostart: Bool, dateNotificationCreated: Date, notificationSwitchIsOn: Bool) {
         self.notificationInterval = notificationInterval
         self.workoutDuration = workoutDuration
         self.notificationText = notificationText
         self.autostart = autostart
+        self.dateNotificationCreated = dateNotificationCreated
+        self.notificationSwitchIsOn = notificationSwitchIsOn
     }
 }
 

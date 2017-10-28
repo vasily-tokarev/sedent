@@ -26,13 +26,19 @@ class Notifications {
         }
         center.getNotificationSettings { (settings) in
             if settings.authorizationStatus != .authorized {
-                // Notifications not allowed
+                print("Notifications are not allowed")
             }
         }
     }
 
-    func createNotification() {
-        dateNotificationCreated = Date()
+    func createNotification(dateNotificationCreated: Date? = nil) {
+        if dateNotificationCreated != nil {
+            self.dateNotificationCreated = dateNotificationCreated
+        } else {
+            self.dateNotificationCreated = Date()
+            state.settings[0].dateNotificationCreated = self.dateNotificationCreated!
+            let _ = state.settings.save()
+        }
         let content = UNMutableNotificationContent()
 //    content.title = "Notification"
         content.body = state.settings[0].notificationText

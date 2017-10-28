@@ -26,13 +26,9 @@ class CoachViewController: UIViewController {
 
         dateNotificationCreated = Date()
         coach.coachViewDelegate = self
-        print("refreshing")
         state.workouts.refresh()
-        print("refreshed")
         coach.start(workout: state.workouts.first!)
-        print("starting")
         updateView()
-        print("updating view")
     }
 
     override func viewWillDisappear(_ animated: Bool) {

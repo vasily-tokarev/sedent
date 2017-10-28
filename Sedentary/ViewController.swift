@@ -23,10 +23,8 @@ class ViewController: UIViewController {
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // TODO: Check the destination.
-        print("segue 1")
         let coachVC = segue.destination as? CoachViewController
         coachVC?.delegate = self
-        print("segue 2")
     }
 
     @IBAction func unwindToMain(segue: UIStoryboardSegue) {
@@ -41,6 +39,9 @@ class ViewController: UIViewController {
         if exerciseNotificationSwitch.isOn {
 //            createNotification()
             startTimer()
+            state.settings[0].notificationSwitchIsOn = true
+            state.settings[0].dateNotificationCreated = Date()
+            let _ = state.settings.save()
         } else {
             exerciseTimerLabel.text = "00:00"
             timer.invalidate()
@@ -48,6 +49,11 @@ class ViewController: UIViewController {
     }
 
     var timer: Timer = Timer()
+
+    func resumeTimer() {
+        notifications.createNotification(dateNotificationCreated: state.settings[0].dateNotificationCreated)
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(ViewController.updateTimer), userInfo: nil, repeats: true)
+    }
 
     func startTimer() {
         exerciseTimerLabel.textColor = .white
@@ -72,6 +78,7 @@ class ViewController: UIViewController {
         exerciseTimerLabel.text = String(format: "%02i:%02i", Int(minutesLeft), Int(secondsLeft))
         if secondsSinceNotificationCreated > notifications.notificationInterval {
             exerciseTimerLabel.textColor = .red
+            exerciseTimerLabel.text = "00:00"
             timer.invalidate()
         }
     }
@@ -83,7 +90,10 @@ class ViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        print(workoutCompleted)
+        if state.settings[0].notificationSwitchIsOn {
+            exerciseNotificationSwitch.isOn = state.settings[0].notificationSwitchIsOn
+            resumeTimer()
+        }
 
         if self.workoutCompleted && exerciseNotificationSwitch.isOn {
             startTimer()
