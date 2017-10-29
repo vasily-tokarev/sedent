@@ -77,8 +77,10 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
         }
 
         if state.exercises.save() {
-            print("going back from ExerciseTableViewController") // This will not execute, will it?
-            performSegue(withIdentifier: Navigation.Segue.unwindToWorkoutsExercises.identifier, sender: self)
+            if state.enabledExercises.delete(exercise: exercise) {
+                state.workouts.refresh()
+                performSegue(withIdentifier: Navigation.Segue.unwindToWorkoutsExercises.identifier, sender: self)
+            }
         }
     }
 

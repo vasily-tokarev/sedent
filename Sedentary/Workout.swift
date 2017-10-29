@@ -97,21 +97,6 @@ class Coach {
     }
 
     init() {
-//        var currentWorkout: Workout
-//
-//        if var currentWorkout = state.workouts.next {
-//            state.workouts.assignNext(workout: currentWorkout)
-//            self.workout = currentWorkout
-//        } else if var currentWorkout = state.workouts.first {
-//            self.workout = currentWorkout
-//            state.workouts.assignNext(workout: currentWorkout)
-//        }
-
-//        guard state.workouts.count > 0 else {
-//            coachViewDelegate?.assignPlaceholders()
-//            return
-//        }
-
         self.workout = state.workouts.returnAndAssignNext()
         self.currentExercise = workout.exercises.first!
 
@@ -155,10 +140,12 @@ class Coach {
             // Time is up, complete the exercise.
             if currentExercise == workout.exercises.last {
                 // perform last one and quit
+                print("last exercise")
                 self.timer!.invalidate()
                 coachViewDelegate?.performSegueToReturnBack()
 //                mainViewDelegate?.workoutCompleted = true
             } else {
+                print("next exercise")
                 self.currentExercise = workout.exercises[self.currentExerciseIndex+1]
                 coachViewDelegate!.exerciseChanged()
                 self.exerciseStarted = Date()
@@ -188,10 +175,15 @@ class Exercise: Codable, Equatable {
     var description: String?
 
     init(id: Int? = nil, name: String? = nil, duration: Int? = nil, speech: Speech? = nil, description: String? = "") {
-        if state.exercises.count > 0 {
-            self.id = state.exercises.count + 1
+
+        if id != nil {
+            self.id = id
         } else {
-            self.id = 0
+            if state.exercises.count > 0 {
+                self.id = state.exercises.count + 1
+            } else {
+                self.id = 0
+            }
         }
 
         self.name = name
@@ -330,11 +322,14 @@ extension Array where Element: EnabledExercise {
         return manager.save(data: self)
     }
 
-//    func delete(exercise: Exercise) -> [EnabledExercise] {self
-//        state.enabledExercises = state.enabledExercises.filter { $0.exerciseId != exercise.id}
-//        workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: state.enabledExercises)) // Add a typealias for this.
-//        return state.enabledExercises
+//    func findByExerciseId(id: Int) -> EnabledExercise {
+//        return self.filter { $0.exerciseId == id }[0]
 //    }
+
+    func delete(exercise: Exercise) -> Bool {
+        state.enabledExercises = state.enabledExercises.filter { $0.exerciseId != exercise.id}
+        return state.enabledExercises.save()
+    }
 }
 
 typealias SortedExercisesTuple = (exercisesUsed: [EnabledExercise], exercisesLeft: [EnabledExercise])
@@ -360,16 +355,10 @@ extension Array where Element: Workout {
     }
 
     func assignNext(workout: Workout) -> () {
-        print("assigning next 0")
         let currentWorkoutIndex: Int = state.workouts.index(of: workout)!
-        print("assigning next")
-        print(state.workouts.count)
-        print(currentWorkoutIndex + 1)
         if state.workouts.count > currentWorkoutIndex + 1 {
-            print("assigning next 1")
-           state.workouts[currentWorkoutIndex + 1].next = true
+            state.workouts[currentWorkoutIndex + 1].next = true
         } else {
-            print("assigning next 2")
             if let firstWorkout = state.workouts.first {
                 firstWorkout.next = true
             }
@@ -383,12 +372,18 @@ extension Array where Element: Workout {
         return manager.save(data: self)
     }
 
-    func findBy(id: Int) -> Workout {
-        return self.filter { $0.id == id }[0]
+    func findBy(id: Int) -> Workout? {
+        let workouts: [Workout?] = self.filter { $0.id == id }
+        if let workout = workouts[0] {
+            return workout
+        } else {
+            return nil
+        }
     }
 
     func refresh() {
         state.workouts = []
+//        state.workouts.save()
         // This removed "next" workout.
         // Assign last workout id?
         self.arrange(exercises: (exercisesUsed: [], exercisesLeft: state.enabledExercises))
@@ -398,9 +393,15 @@ extension Array where Element: Workout {
         // Might recurse if duration is too small.
         var duration = Int(state.settings[0].workoutDurationInSeconds)
 
+        // Skip exercises with long (> settings) duration.
+
         func sortExercises(exercises: SortedExercisesTuple) -> SortedExercisesTuple {
             var sortedExercises: SortedExercisesTuple = (exercisesUsed: [], exercisesLeft: [])
             exercises.exercisesLeft.forEach({ exercise in
+                guard exercise.duration <= state.settings[0].workoutDurationInSeconds else {
+                    print("Exercise is too long")
+                    return
+                }
                 duration -= exercise.duration
                 if duration >= 0 {
                     sortedExercises.exercisesUsed.append(exercise)
@@ -429,8 +430,16 @@ class EnabledExercise: Codable, Equatable {
     let exerciseId: Int
     var workoutId: Int?
     let name: String
-    var duration: Int { return state.exercises.filter { $0.id == exerciseId
-    }[0].duration }
+    var duration: Int {
+//        return state.exercises.filter { $0.id == exerciseId }[0].duration
+        let filteredExercises = state.exercises.filter { $0.id == exerciseId }
+        if filteredExercises.count > 0 {
+            return filteredExercises[0].duration
+        } else {
+            print("Exercise not found")
+            return 0
+        }
+    }
 
     init(workoutId: Int?, exerciseId: Int, name: String) {
         self.exerciseId = exerciseId
@@ -461,9 +470,12 @@ class Workout: Codable, Equatable {
 
     var duration: Int {
         return self.enabledExercises!.reduce(0, { duration, enabledExercise in
-            let exercise = exercises.filter { $0.id == enabledExercise.exerciseId
-            }[0]
-            return exercise.duration + duration
+            let exercisesFiltered: [Exercise] = exercises.filter { $0.id == enabledExercise.exerciseId }
+            if exercisesFiltered.count > 0 {
+                return exercisesFiltered[0].duration + duration
+            } else {
+                return duration
+            }
         })
     }
 

@@ -25,9 +25,10 @@ class WorkoutsExercisesTableViewCell: UITableViewCell {
                     nextLabel.isHidden = false
                 }
                 workoutTimeLabel.isHidden = false
-                if let workoutId = enabledExercise.workoutId {
-                    workoutTimeLabel.text = String(state.workouts.findBy(id: workoutId).duration)
-                }
+//                if let workoutId = enabledExercise.workoutId {
+                    workoutTimeLabel.text = String(workout.duration)
+//                    workoutTimeLabel.text = String(state.workouts.findBy(id: workoutId).duration)
+//                }
             } else {
                 workoutTimeLabel.isHidden = true
             }

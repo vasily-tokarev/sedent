@@ -93,7 +93,9 @@ class ViewController: UIViewController {
         super.viewWillAppear(animated)
 
         if state.workouts.count == 0 {
-            startButton.isEnabled = false
+            startButton.isHidden = true
+        } else {
+            startButton.isHidden = false
         }
 
         if state.settings[0].notificationSwitchIsOn {
