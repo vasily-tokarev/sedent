@@ -103,21 +103,33 @@
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="12:30" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mvH-yF-Vht">
-                                            <rect key="frame" x="277" y="16" width="43" height="11.5"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                            <nil key="textColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
+                                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="h81-Mj-vOH">
+                                            <rect key="frame" x="269" y="2" width="43" height="39.5"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="12:30" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mvH-yF-Vht">
+                                                    <rect key="frame" x="0.0" y="0.0" width="43" height="39.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="NEXT" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fKu-Nx-qdw">
+                                                    <rect key="frame" x="0.0" y="-2" width="43" height="0.0"/>
+                                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="10"/>
+                                                    <color key="textColor" red="1" green="0.5" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <color key="highlightedColor" red="1" green="0.5" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                </label>
+                                            </subviews>
+                                        </stackView>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="mvH-yF-Vht" firstAttribute="top" secondItem="n1j-Ab-70J" secondAttribute="topMargin" constant="8" id="Beo-bD-eT0"/>
-                                        <constraint firstAttribute="bottomMargin" secondItem="mvH-yF-Vht" secondAttribute="bottom" constant="8" id="IXH-pz-i1w"/>
-                                        <constraint firstItem="mvH-yF-Vht" firstAttribute="trailing" secondItem="n1j-Ab-70J" secondAttribute="trailingMargin" constant="8" id="zRz-gx-ReY"/>
+                                        <constraint firstItem="h81-Mj-vOH" firstAttribute="top" secondItem="n1j-Ab-70J" secondAttribute="top" constant="2" id="3PK-05-YZk"/>
+                                        <constraint firstAttribute="trailing" secondItem="h81-Mj-vOH" secondAttribute="trailing" constant="8" id="JxX-gM-gtB"/>
+                                        <constraint firstAttribute="bottom" secondItem="h81-Mj-vOH" secondAttribute="bottom" constant="2" id="l4P-3V-Tza"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
                                     <outlet property="nameLabel" destination="s5X-FL-xNc" id="qWI-92-HBG"/>
+                                    <outlet property="nextLabel" destination="fKu-Nx-qdw" id="kK3-TU-Jd2"/>
                                     <outlet property="workoutTimeLabel" destination="mvH-yF-Vht" id="N2M-WP-ubL"/>
                                 </connections>
                             </tableViewCell>

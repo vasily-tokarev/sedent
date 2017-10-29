@@ -41,11 +41,13 @@ class ViewController: UIViewController {
             startTimer()
             state.settings[0].notificationSwitchIsOn = true
             state.settings[0].dateNotificationCreated = Date()
-            let _ = state.settings.save()
         } else {
+            state.settings[0].notificationSwitchIsOn = false
             exerciseTimerLabel.text = "00:00"
+            exerciseTimerLabel.textColor = .white
             timer.invalidate()
         }
+        let _ = state.settings.save()
     }
 
     var timer: Timer = Timer()
@@ -89,6 +91,12 @@ class ViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+
+        state.workouts.forEach {
+            if $0.next {
+                print($0.next)
+            }
+        }
 
         if state.settings[0].notificationSwitchIsOn {
             exerciseNotificationSwitch.isOn = state.settings[0].notificationSwitchIsOn

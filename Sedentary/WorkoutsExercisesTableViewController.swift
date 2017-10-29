@@ -193,6 +193,11 @@ class WorkoutsExercisesTableViewController: UITableViewController {
         return true
     }
 
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+//        return super.tableView(tableView, heightForRowAt: indexPath)
+        return 50
+    }
+
 //    @IBAction func unwindToWorkoutsExercises(segue: UIStoryboardSegue) {
 //        print("unwinding")
 //    }

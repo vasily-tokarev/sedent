@@ -32,6 +32,7 @@ func firstRun() {
         state.settings.append(Settings(notificationInterval: 0.2, workoutDuration: 2.0, notificationText: "It is time to move!", autostart: false, dateNotificationCreated: Date(), notificationSwitchIsOn: false))
         let _ = state.settings.save()
     }
+    // arrange workouts and add default exercises
 }
 
 class Settings: Codable {
@@ -189,6 +190,7 @@ class Coach {
             print("Coach init failed: currentExercise is not set")
             self.currentExercise = Exercise()
         }
+        print("init success")
     }
 }
 
@@ -343,7 +345,7 @@ extension Array where Element: EnabledExercise {
         return manager.save(data: self)
     }
 
-//    func delete(exercise: Exercise) -> [EnabledExercise] {
+//    func delete(exercise: Exercise) -> [EnabledExercise] {self
 //        state.enabledExercises = state.enabledExercises.filter { $0.exerciseId != exercise.id}
 //        workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: state.enabledExercises)) // Add a typealias for this.
 //        return state.enabledExercises
@@ -355,11 +357,31 @@ typealias SortedExercisesTuple = (exercisesUsed: [EnabledExercise], exercisesLef
 extension Array where Element: Workout {
     private var manager: DataManager<Workout> { return DataManager() }
 
-    var next: Workout { return self.filter { $0.next == true }[0] }
+    var next: Workout? {
+        if (self.filter { $0.next == true }.count) > 0 {
+            return self.filter { $0.next == true }[0]
+        } else {
+            print("[workouts] are empty.")
+            return nil
+        }
+    }
 
     var saved: [Workout] {
         state.workouts = manager.saved()
         return state.workouts
+    }
+
+    func assignNext(workout: Workout) -> () {
+        let currentWorkoutIndex: Int = state.workouts.index(of: workout)!
+        if state.workouts.count > currentWorkoutIndex {
+           state.workouts[currentWorkoutIndex + 1].next = true
+        } else {
+            if let firstWorkout = state.workouts.first {
+                firstWorkout.next = true
+            }
+        }
+        workout.next = false
+        let _ = state.workouts.save()
     }
 
     func save() -> Bool {
@@ -372,6 +394,9 @@ extension Array where Element: Workout {
     }
 
     func refresh() {
+        state.workouts = []
+        // This removed "next" workout.
+        // Assign last workout id?
         self.arrange(exercises: (exercisesUsed: [], exercisesLeft: state.enabledExercises))
     }
 
@@ -393,28 +418,14 @@ extension Array where Element: Workout {
         }
 
         let sortedExercises = sortExercises(exercises: (exercisesUsed: [], exercisesLeft: exercises.exercisesLeft))
-        state.workouts.append(Workout(next: true, enabledExercises: sortedExercises.exercisesUsed))
+        state.workouts.append(Workout(next: false, enabledExercises: sortedExercises.exercisesUsed))
         if sortedExercises.exercisesLeft.count > 0 {
             state.workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: sortedExercises.exercisesLeft))
         } else {
-            state.workouts.save()
-        }
-    }
-}
-
-struct WorkoutFunctions {
-    let speechSynthesizer: AVSpeechSynthesizer = AVSpeechSynthesizer()
-
-    func dispatchSpeaker(say speech: String, seconds: Int = 0) {
-        let speech = AVSpeechUtterance(string: speech)
-        if seconds == 0 {
-            DispatchQueue.main.async(execute: {
-                self.speechSynthesizer.speak(speech)
-            })
-        } else {
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(seconds), execute: {
-                self.speechSynthesizer.speak(speech)
-            })
+            if let workout = state.workouts.first {
+                workout.next = true
+            }
+            let _ = state.workouts.save()
         }
     }
 }
@@ -436,12 +447,12 @@ class EnabledExercise: Codable, Equatable {
         self.id = state.enabledExercises.count + 1
     }
 
-    static func == (lhs: EnabledExercise, rhs: EnabledExercise) -> Bool{
+    static func == (lhs: EnabledExercise, rhs: EnabledExercise) -> Bool {
         return lhs.id == rhs.id
     }
 }
 
-class Workout: Codable {
+class Workout: Codable, Equatable {
     let id: Int
     var next: Bool = false
     var enabledExercises: [EnabledExercise]?
@@ -464,6 +475,10 @@ class Workout: Codable {
 
     var description: String {
         return "Workout: #\(self.id), next?: \(self.next), exercises.count: \(self.exercises.count), enabledExercises.count: \(self.enabledExercises!.count)"
+    }
+
+    static func == (lhs: Workout, rhs: Workout) -> Bool {
+        return lhs.id == rhs.id
     }
 
     init(next: Bool, enabledExercises: [EnabledExercise]) {

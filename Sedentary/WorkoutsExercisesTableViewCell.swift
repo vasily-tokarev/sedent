@@ -11,29 +11,26 @@ import UIKit
 class WorkoutsExercisesTableViewCell: UITableViewCell {
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var workoutTimeLabel: UILabel!
-
+    @IBOutlet weak var nextLabel: UILabel!
+    
 //    func update(with workout: Workout) {
 //        nameLabel.text = workout.name
 //    }
 
     func update(with enabledExercise: EnabledExercise) {
         nameLabel.text = enabledExercise.name
-//        print("enabledExercise.workoutID \(enabledExercise.workoutID)")
-        state.workouts.forEach({ workout in
-            workout.enabledExercises!.forEach({exercise in
-//                print("exercise.workoutID: \(exercise.workoutID)")
-            })
-        })
-        let exerciseWorkouts = state.workouts.filter({ $0.id == enabledExercise.workoutId })
-        if exerciseWorkouts.count > 0 {
-            let exerciseWorkout = exerciseWorkouts[0]
-//            print("exerciseWOrkout: \(exerciseWorkout)")
-            if exerciseWorkout.enabledExercises![0].id == enabledExercise.id {
-//                print("exerciseWorkout.enabledExercises")
+
+        // TODO: Refactoring.
+        let workouts = state.workouts.filter({ $0.id == enabledExercise.workoutId })
+        if workouts.count > 0 {
+            let workout = workouts[0]
+            if workout.enabledExercises![0].id == enabledExercise.id {
+                if workout.next {
+                    nextLabel.isHidden = false
+                }
                 workoutTimeLabel.isHidden = false
-                if enabledExercise.workoutId != nil {
-//                    workoutTimeLabel.text = String(enabledExercise.workoutID!)
-                    workoutTimeLabel.text = String(state.workouts.findBy(id: enabledExercise.workoutId!).duration)
+                if let workoutId = enabledExercise.workoutId {
+                    workoutTimeLabel.text = String(state.workouts.findBy(id: workoutId).duration)
                 }
             } else {
                 workoutTimeLabel.isHidden = true
@@ -44,11 +41,13 @@ class WorkoutsExercisesTableViewCell: UITableViewCell {
     func update(with exercise: Exercise) {
         nameLabel.text = exercise.name
         workoutTimeLabel.isHidden = true
+        nextLabel.isHidden = true
     }
 
     func update(with text: String) {
         nameLabel.text = text
         workoutTimeLabel.isHidden = true
+        nextLabel.isHidden = true
     }
 
     override func awakeFromNib() {
