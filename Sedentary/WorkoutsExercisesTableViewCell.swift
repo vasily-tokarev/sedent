@@ -13,14 +13,10 @@ class WorkoutsExercisesTableViewCell: UITableViewCell {
     @IBOutlet weak var workoutTimeLabel: UILabel!
     @IBOutlet weak var nextLabel: UILabel!
     
-//    func update(with workout: Workout) {
-//        nameLabel.text = workout.name
-//    }
-
     func update(with enabledExercise: EnabledExercise) {
         nameLabel.text = enabledExercise.name
 
-        // TODO: Refactoring.
+        nextLabel.isHidden = true
         let workouts = state.workouts.filter({ $0.id == enabledExercise.workoutId })
         if workouts.count > 0 {
             let workout = workouts[0]

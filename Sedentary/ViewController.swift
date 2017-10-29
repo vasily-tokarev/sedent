@@ -92,10 +92,8 @@ class ViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        state.workouts.forEach {
-            if $0.next {
-                print($0.next)
-            }
+        if state.workouts.count == 0 {
+            startButton.isEnabled = false
         }
 
         if state.settings[0].notificationSwitchIsOn {

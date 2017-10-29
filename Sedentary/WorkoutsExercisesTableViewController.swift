@@ -171,12 +171,12 @@ class WorkoutsExercisesTableViewController: UITableViewController {
             let movedExercise = state.exercises[fromIndexPath.row]
             state.exercises.remove(at: fromIndexPath.row)
             state.exercises.insert(movedExercise, at: to.row)
-            state.exercises.save()
+            let _ = state.exercises.save()
         case fromWorkoutsToWorkouts:
             let movedExercise = state.enabledExercises[fromIndexPath.row]
             state.enabledExercises.remove(at: fromIndexPath.row)
             state.enabledExercises.insert(movedExercise, at: to.row)
-            state.enabledExercises.save()
+            let _ = state.enabledExercises.save()
         case fromWorkoutsToExercises:
             print("fromWorkoutsToExercises")
                 // Remove workouts[fromIndexPath.row]

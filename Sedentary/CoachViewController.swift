@@ -14,7 +14,8 @@ class CoachViewController: UIViewController {
     @IBOutlet weak var exerciseImageView: UIImageView!
     @IBOutlet weak var exerciseDescriptionTextView: UITextView!
     
-    let coach: Coach = Coach()
+    var coach: Coach = Coach()
+
     var dateNotificationCreated: Date?
     var exerciseTimer: Timer?
     var delegate: ViewController?
@@ -22,30 +23,11 @@ class CoachViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        print("loading view")
-        UIApplication.shared.isIdleTimerDisabled = true // Disable it for other views?
-
+        UIApplication.shared.isIdleTimerDisabled = true
         dateNotificationCreated = Date()
         coach.coachViewDelegate = self
-        print("workouts refreshed")
-        if let workout = state.workouts.next {
-            print("next")
-            coach.start(workout: workout)
-            state.workouts.assignNext(workout: workout)
-        } else {
-            // assign next
-            print("not next")
-            if let workout = state.workouts.first {
-                print("assigned workout")
-                coach.start(workout: workout)
-                state.workouts.assignNext(workout: workout)
-            } else {
-                print("Can't assign a workout")
-            }
-        }
-        print("updating view")
+
         updateView()
-        print("view updated")
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -66,22 +48,15 @@ class CoachViewController: UIViewController {
     }
 
     func updateView() {
-        print("updateView()")
         exerciseNameLabel.text = coach.currentExercise.name
         exerciseDescriptionTextView.text = coach.currentExercise.description
 
-        print("labels updated")
         let docDir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         let imageURL = docDir.appendingPathComponent("\(coach.currentExercise.name)-\(coach.currentExercise.id)-0.png")
-//        let imageURL = "\(coach.currentExercise.name)-\(coach.currentExercise.id)-0.png"
 
         if let data = try? Data(contentsOf: imageURL) {
             exerciseImageView.image = UIImage(data: data)
         }
-
-//        if let image = UIImage(contentsOfFile: imageURL) {
-//            exerciseImageView.image = image
-//        }
     }
 
     func exerciseChanged() {

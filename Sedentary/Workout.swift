@@ -86,7 +86,7 @@ class Coach {
 
     func stop() throws {
         // https://stackoverflow.com/questions/44633729/stop-a-dispatchqueue-that-is-running-on-the-main-thread
-        print("stopping workout")
+//        print("stopping workout")
 
         guard let timer = timer else {
             print("Workout: timer is not set")
@@ -96,28 +96,28 @@ class Coach {
         timer.invalidate()
     }
 
-    func start(workout: Workout) {
+    init() {
+//        var currentWorkout: Workout
+//
+//        if var currentWorkout = state.workouts.next {
+//            state.workouts.assignNext(workout: currentWorkout)
+//            self.workout = currentWorkout
+//        } else if var currentWorkout = state.workouts.first {
+//            self.workout = currentWorkout
+//            state.workouts.assignNext(workout: currentWorkout)
+//        }
+
+//        guard state.workouts.count > 0 else {
+//            coachViewDelegate?.assignPlaceholders()
+//            return
+//        }
+
+        self.workout = state.workouts.returnAndAssignNext()
+        self.currentExercise = workout.exercises.first!
+
         notifications.center.removeAllDeliveredNotifications()
 
-//        exercises = workout.exercises.reversed()
-        print("workout.description: \(workout.description)")
-        print("exercises.count: \(exercises.count)")
-
-        guard let currentExercise = exercises.first else {
-            print("currentExercise is not set")
-            print("workout: \(workout)")
-            print("workout.exercises.count: \(workout.exercises.count)")
-            return
-        }
-
-
         totalDuration = exercises.duration
-
-        exercises.forEach { e in
-            print("e.id: \(e.id)")
-            print("e.name: \(e.name)")
-        }
-        print("currentExercise.name: \(currentExercise.name)")
 
         self.startTimer()
         speaker(say: currentExercise.speech!.start!)
@@ -133,9 +133,9 @@ class Coach {
         let minutesLeft = ((currentExerciseDuration - secondsSinceExerciseStarted) / 60)
 
         if secondsLeft < 0 {
-            self.coachViewDelegate!.updateLabel(with: "0:00")
+            self.coachViewDelegate?.updateLabel(with: "0:00")
         } else {
-            self.coachViewDelegate!.updateLabel(with: String(format: "%02i:%02i", Int(minutesLeft), Int(secondsLeft)))
+            self.coachViewDelegate?.updateLabel(with: String(format: "%02i:%02i", Int(minutesLeft), Int(secondsLeft)))
         }
 
 //        switch secondsLeft {
@@ -176,21 +176,6 @@ class Coach {
             self.timer!.invalidate()
         } // or just invalidate it in any case?
         self.timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateTimer), userInfo: nil, repeats: true)
-    }
-
-    init() {
-        print("init")
-//        self.workout = state.workouts.next
-        state.workouts.refresh()
-        self.workout = state.workouts.first!
-        print("init 1")
-        if let currentExercise = self.workout.exercises.first {
-            self.currentExercise = currentExercise
-        } else {
-            print("Coach init failed: currentExercise is not set")
-            self.currentExercise = Exercise()
-        }
-        print("init success")
     }
 }
 
@@ -357,12 +342,15 @@ typealias SortedExercisesTuple = (exercisesUsed: [EnabledExercise], exercisesLef
 extension Array where Element: Workout {
     private var manager: DataManager<Workout> { return DataManager() }
 
-    var next: Workout? {
+    func returnAndAssignNext() -> Workout {
         if (self.filter { $0.next == true }.count) > 0 {
-            return self.filter { $0.next == true }[0]
+            let workout = self.filter { $0.next == true }[0]
+            self.assignNext(workout: workout)
+            return workout
         } else {
-            print("[workouts] are empty.")
-            return nil
+            let workout = self.first!
+            self.assignNext(workout: workout)
+            return workout
         }
     }
 
@@ -372,10 +360,16 @@ extension Array where Element: Workout {
     }
 
     func assignNext(workout: Workout) -> () {
+        print("assigning next 0")
         let currentWorkoutIndex: Int = state.workouts.index(of: workout)!
-        if state.workouts.count > currentWorkoutIndex {
+        print("assigning next")
+        print(state.workouts.count)
+        print(currentWorkoutIndex + 1)
+        if state.workouts.count > currentWorkoutIndex + 1 {
+            print("assigning next 1")
            state.workouts[currentWorkoutIndex + 1].next = true
         } else {
+            print("assigning next 2")
             if let firstWorkout = state.workouts.first {
                 firstWorkout.next = true
             }
