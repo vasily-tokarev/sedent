@@ -76,8 +76,8 @@ class Coach {
     var exercises: [Exercise] { return workout.exercises }
     var currentExercise: Exercise
     var currentExerciseIndex: Int { return workout.exercises.index(of: currentExercise)! }
-//    var currentExerciseDuration: Int { return currentExercise.duration }
-    var currentExerciseDuration: Int { return 3 }
+    var currentExerciseDuration: Int { return currentExercise.duration }
+//    var currentExerciseDuration: Int { return 3 }
     var secondsSinceExerciseStarted: Int { return Int(Date().timeIntervalSince(exerciseStarted!)) }
     var workout: Workout
     var totalDuration: Int?
@@ -132,18 +132,18 @@ class Coach {
             self.coachViewDelegate?.updateLabel(with: String(format: "%02i:%02i", Int(minutesLeft), Int(secondsLeft)))
         }
 
-//        switch secondsLeft {
-//        case 30:
-//            speaker(say: currentExercise.speech!.thirtySecondsLeft!)
-//        case 10:
-//            speaker(say: currentExercise.speech!.tenSecondsLeft!)
-//        case 5:
-//            speaker(say: currentExercise.speech!.fiveSecondsLeft!)
-//        case 0:
-//            speaker(say: currentExercise.speech!.end!)
-//        default:
-//            break
-//        }
+        switch secondsLeft {
+        case 30:
+            speaker(say: currentExercise.speech!.thirtySecondsLeft!)
+        case 10:
+            speaker(say: currentExercise.speech!.tenSecondsLeft!)
+        case 5:
+            speaker(say: currentExercise.speech!.fiveSecondsLeft!)
+        case 0:
+            speaker(say: currentExercise.speech!.end!)
+        default:
+            break
+        }
 
         if Int(secondsSinceExerciseStarted) > currentExerciseDuration {
             // Time is up, complete the exercise.
@@ -162,7 +162,7 @@ class Coach {
 
                 self.timer!.invalidate()
                 self.startTimer()
-//                speaker(say: currentExercise.speech!.start!)
+                speaker(say: currentExercise.speech!.start!)
             }
         }
     }
