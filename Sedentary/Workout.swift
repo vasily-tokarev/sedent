@@ -35,6 +35,15 @@ func firstRun() {
     // arrange workouts and add default exercises
 }
 
+struct Formatter: Codable {
+    // 120 -> 2:00
+    func secondsToHuman(seconds: Int) -> String {
+        return String(format: "%02i:%02i", seconds / 60, seconds % 60)
+    }
+}
+
+let formatter = Formatter()
+
 class Settings: Codable {
     var notificationInterval: Double
     var dateNotificationCreated: Date

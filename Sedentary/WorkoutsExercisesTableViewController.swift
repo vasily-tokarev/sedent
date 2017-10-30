@@ -126,6 +126,7 @@ class WorkoutsExercisesTableViewController: UITableViewController {
             if indexPath.section == workoutsSection {
                 state.enabledExercises.remove(at: indexPath.row)
                 if state.enabledExercises.save() {
+                    state.workouts.refresh()
                     tableView.deleteRows(at: [indexPath], with: .fade)
                 }
             } else {
@@ -144,9 +145,9 @@ class WorkoutsExercisesTableViewController: UITableViewController {
                 if state.exercises.save() {
                     tableView.deleteRows(at: [indexPath], with: .fade)
                 }
-                tableView.reloadData()
                 state.workouts.refresh()
             }
+            tableView.reloadData()
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }

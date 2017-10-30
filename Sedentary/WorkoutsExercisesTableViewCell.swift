@@ -12,7 +12,7 @@ class WorkoutsExercisesTableViewCell: UITableViewCell {
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var workoutTimeLabel: UILabel!
     @IBOutlet weak var nextLabel: UILabel!
-    
+
     func update(with enabledExercise: EnabledExercise) {
         nameLabel.text = enabledExercise.name
 
@@ -26,7 +26,8 @@ class WorkoutsExercisesTableViewCell: UITableViewCell {
                 }
                 workoutTimeLabel.isHidden = false
 //                if let workoutId = enabledExercise.workoutId {
-                    workoutTimeLabel.text = String(workout.duration)
+                workoutTimeLabel.textColor = .black
+                workoutTimeLabel.text = formatter.secondsToHuman(seconds: workout.duration)
 //                    workoutTimeLabel.text = String(state.workouts.findBy(id: workoutId).duration)
 //                }
             } else {
@@ -36,9 +37,17 @@ class WorkoutsExercisesTableViewCell: UITableViewCell {
     }
 
     func update(with exercise: Exercise) {
+        print("updating cell with exercise \(exercise.name)")
         nameLabel.text = exercise.name
-        workoutTimeLabel.isHidden = true
+        workoutTimeLabel.isHidden = false
         nextLabel.isHidden = true
+
+        workoutTimeLabel.text = formatter.secondsToHuman(seconds: exercise.duration)
+        if exercise.duration > state.settings[0].workoutDurationInSeconds {
+            workoutTimeLabel.textColor = .red
+        } else {
+            workoutTimeLabel.textColor = .black
+        }
     }
 
     func update(with text: String) {
