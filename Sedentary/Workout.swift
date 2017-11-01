@@ -153,7 +153,7 @@ class Coach {
             speaker(say: currentExercise.speech.fiveSecondsLeft)
         case 0:
             speaker(say: currentExercise.speech.end)
-            if secondsSinceExerciseStarted > currentExerciseDuration && currentExercise == workout.exercises.last {
+            if secondsSinceExerciseStarted >= currentExerciseDuration && currentExercise == workout.exercises.last {
                 speaker(say: state.settings[0].workoutCompleteSpeech)
             }
         default:

@@ -63,10 +63,10 @@ class ViewController: UIViewController {
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(ViewController.updateTimer), userInfo: nil, repeats: true)
     }
 
-    func restartTimer() {
-        timer.invalidate()
-        startTimer()
-    }
+//    func restartTimer() {
+//        timer.invalidate()
+//        startTimer()
+//    }
 
     @objc func updateTimer() throws {
         guard let dateNotificationCreated = notifications.dateNotificationCreated else {
@@ -104,6 +104,7 @@ class ViewController: UIViewController {
         }
 
         if self.workoutCompleted && exerciseNotificationSwitch.isOn {
+            print("workout completed, switch is on, starting the timer")
             startTimer()
         }
         self.workoutCompleted = false
