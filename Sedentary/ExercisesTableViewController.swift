@@ -27,15 +27,16 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
     @IBOutlet weak var descriptionTextField: UITextField!
     
     @IBAction func durationStepperValueChanged(_ sender: UIStepper) {
-        // TODO: Hide thirtySecondsSpeech
         let seconds = Int(durationStepper.value)
         let (h, m, s) = secondsToHoursMinutesSeconds(seconds: seconds)
         durationLabel.text = String(format: "%02i:%02i", m, s)
-        if durationStepper.value < 60.0 {
-            thirtySecondsLeftSpeechTextField.isEnabled = false
-        } else {
-            thirtySecondsLeftSpeechTextField.isEnabled = true
-        }
+
+        // Hide thirtySecondsSpeech
+//        if durationStepper.value < 60.0 {
+//            thirtySecondsLeftSpeechTextField.isEnabled = false
+//        } else {
+//            thirtySecondsLeftSpeechTextField.isEnabled = true
+//        }
     }
 
     func secondsToHoursMinutesSeconds (seconds: Int) -> (Int, Int, Int) {
