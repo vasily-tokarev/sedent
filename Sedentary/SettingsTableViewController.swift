@@ -79,7 +79,6 @@ class SettingsTableViewController: UITableViewController {
 
         let notificationIntervalString = String(format: "%.0f", state.settings[0].notificationInterval)
         notificationIntervalStepperLabel.text = "\(notificationIntervalString) minutes"
-        print(notificationIntervalString)
 
         workoutDurationStepper.value = state.settings[0].workoutDuration
         let workoutDurationString = String(format: "%.0f", workoutDurationStepper.value)

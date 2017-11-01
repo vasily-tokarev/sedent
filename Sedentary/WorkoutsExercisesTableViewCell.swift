@@ -37,7 +37,7 @@ class WorkoutsExercisesTableViewCell: UITableViewCell {
     }
 
     func update(with exercise: Exercise) {
-        print("updating cell with exercise \(exercise.name)")
+//        print("updating cell with exercise \(exercise.name)")
         nameLabel.text = exercise.name
         workoutTimeLabel.isHidden = false
         nextLabel.isHidden = true

@@ -164,16 +164,13 @@ class Coach {
             // Time is up, complete the exercise.
             if currentExercise == workout.exercises.last {
                 // perform last one and quit
-                print("last exercise")
                 self.timer!.invalidate()
                 coachViewDelegate?.performSegueToReturnBack()
 //                mainViewDelegate?.workoutCompleted = true
             } else {
-                print("next exercise")
                 self.currentExercise = workout.exercises[self.currentExerciseIndex+1]
                 coachViewDelegate!.exerciseChanged()
                 self.exerciseStarted = Date()
-                print(Int(Date().timeIntervalSince(exerciseStarted)))
 
                 self.timer!.invalidate()
                 self.startTimer()
