@@ -90,6 +90,9 @@ class SettingsTableViewController: UITableViewController {
         }
         workoutDurationStepperLabel.text = "\(workoutDurationString) \(text)"
 
+        workoutCompleteSpeech.text = state.settings[0].workoutCompleteSpeech
+        notificationTextField.text = state.settings[0].notificationText
+
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
         
