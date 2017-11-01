@@ -456,9 +456,9 @@ class EnabledExercise: Codable, Equatable {
 class Workout: Codable, Equatable {
     let id: Int
     var next: Bool = false
-    var enabledExercises: [EnabledExercise]?
+    var enabledExercises: [EnabledExercise]
     var exercises: [Exercise] {
-        return self.enabledExercises!.flatMap { enabledExercise in
+        return self.enabledExercises.flatMap { enabledExercise in
             return state.exercises.filter { exercise in
                 return exercise.id == enabledExercise.exerciseId
             }
@@ -467,7 +467,7 @@ class Workout: Codable, Equatable {
     let reminder: Int = testMode ? 3 : 30 // delete
 
     var duration: Int {
-        return self.enabledExercises!.reduce(0, { duration, enabledExercise in
+        return self.enabledExercises.reduce(0, { duration, enabledExercise in
             let exercisesFiltered: [Exercise] = exercises.filter { $0.id == enabledExercise.exerciseId }
             if exercisesFiltered.count > 0 {
                 return exercisesFiltered[0].duration + duration
@@ -478,7 +478,7 @@ class Workout: Codable, Equatable {
     }
 
     var description: String {
-        return "Workout: #\(self.id), next?: \(self.next), exercises.count: \(self.exercises.count), enabledExercises.count: \(self.enabledExercises!.count)"
+        return "Workout: #\(self.id), next?: \(self.next), exercises.count: \(self.exercises.count), enabledExercises.count: \(self.enabledExercises.count)"
     }
 
     static func == (lhs: Workout, rhs: Workout) -> Bool {
@@ -492,7 +492,7 @@ class Workout: Codable, Equatable {
 //        self.exercises = exercises
         self.id = state.workouts.count + 1
 
-        self.enabledExercises!.forEach { exercise in
+        self.enabledExercises.forEach { exercise in
             exercise.workoutId = self.id
         }
 

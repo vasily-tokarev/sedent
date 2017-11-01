@@ -20,7 +20,7 @@ class WorkoutsExercisesTableViewCell: UITableViewCell {
         let workouts = state.workouts.filter({ $0.id == enabledExercise.workoutId })
         if workouts.count > 0 {
             let workout = workouts[0]
-            if workout.enabledExercises![0].id == enabledExercise.id {
+            if workout.enabledExercises[0].id == enabledExercise.id {
                 if workout.next {
                     nextLabel.isHidden = false
                 }
