@@ -52,15 +52,15 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
 
         let exercise = Exercise (
                 id: currentExercise?.id,
-                name: nameTextField.text!,
+                name: nameTextField.text!.isEmpty ? "Exercise" : nameTextField.text!,
                 duration: Int(durationStepper.value),
-                speech: Exercise.Speech(start: startSpeechTextField.text,
-                        thirtySecondsLeft: thirtySecondsLeftSpeechTextField.text,
-                        tenSecondsLeft: tenSecondsLeftSpeechTextField.text,
-                        fiveSecondsLeft: fiveSecondsLeftSpeechTextField.text,
-                        end: endSpeechTextField.text
+                speech: Exercise.Speech(start: startSpeechTextField.text ?? "",
+                        thirtySecondsLeft: thirtySecondsLeftSpeechTextField.text ?? "",
+                        tenSecondsLeft: tenSecondsLeftSpeechTextField.text ?? "",
+                        fiveSecondsLeft: fiveSecondsLeftSpeechTextField.text ?? "",
+                        end: endSpeechTextField.text ?? ""
                 ),
-                description: descriptionTextField.text
+                description: descriptionTextField.text ?? ""
         )
 
         if let _ = currentExercise {
@@ -120,15 +120,15 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
                     imageView.image = UIImage(data: data)
                 }
 
-                nameTextField.text! = exercise.name!
+                nameTextField.text! = exercise.name
                 durationStepper.value = Double(exercise.duration)
 //                durationLabel.text = String(exercise.duration)
                 formatDuration(value: Double(exercise.duration))
-                startSpeechTextField.text = exercise.speech!.start
-                thirtySecondsLeftSpeechTextField.text = exercise.speech?.thirtySecondsLeft
-                tenSecondsLeftSpeechTextField.text = exercise.speech?.tenSecondsLeft
-                fiveSecondsLeftSpeechTextField.text = exercise.speech?.fiveSecondsLeft
-                endSpeechTextField.text = exercise.speech?.end
+                startSpeechTextField.text = exercise.speech.start
+                thirtySecondsLeftSpeechTextField.text = exercise.speech.thirtySecondsLeft
+                tenSecondsLeftSpeechTextField.text = exercise.speech.tenSecondsLeft
+                fiveSecondsLeftSpeechTextField.text = exercise.speech.fiveSecondsLeft
+                endSpeechTextField.text = exercise.speech.end
                 descriptionTextField.text = exercise.description
             }
         }

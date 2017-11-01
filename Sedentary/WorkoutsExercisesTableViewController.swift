@@ -165,7 +165,7 @@ class WorkoutsExercisesTableViewController: UITableViewController {
         case fromExercisesToWorkouts:
             let exercise = state.exercises[fromIndexPath.row]
             if exercise.duration < Int(state.settings[0].workoutDurationInSeconds) {
-                state.enabledExercises.insert(EnabledExercise(workoutId: nil, exerciseId: exercise.id!, name: exercise.name!), at: to.row)
+                state.enabledExercises.insert(EnabledExercise(workoutId: nil, exerciseId: exercise.id!, name: exercise.name), at: to.row)
                 let _ = state.enabledExercises.save()
             }
         case fromExercisesToExercises:

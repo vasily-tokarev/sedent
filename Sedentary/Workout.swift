@@ -114,7 +114,7 @@ class Coach {
         totalDuration = exercises.duration
 
         self.startTimer()
-        speaker(say: currentExercise.speech!.start!)
+        speaker(say: currentExercise.speech.start)
         exerciseStarted = Date()
     }
 
@@ -134,13 +134,13 @@ class Coach {
 
         switch secondsLeft {
         case 30:
-            speaker(say: currentExercise.speech!.thirtySecondsLeft!)
+            speaker(say: currentExercise.speech.thirtySecondsLeft)
         case 10:
-            speaker(say: currentExercise.speech!.tenSecondsLeft!)
+            speaker(say: currentExercise.speech.tenSecondsLeft)
         case 5:
-            speaker(say: currentExercise.speech!.fiveSecondsLeft!)
+            speaker(say: currentExercise.speech.fiveSecondsLeft)
         case 0:
-            speaker(say: currentExercise.speech!.end!)
+            speaker(say: currentExercise.speech.end)
         default:
             break
         }
@@ -162,7 +162,7 @@ class Coach {
 
                 self.timer!.invalidate()
                 self.startTimer()
-                speaker(say: currentExercise.speech!.start!)
+                speaker(say: currentExercise.speech.start)
             }
         }
     }
@@ -177,14 +177,12 @@ class Coach {
 
 class Exercise: Codable, Equatable {
     let id: Int?
-    var name: String? = "Exercise"
-    var duration: Int = 60
-//    var image: UIImage? = nil
-    var speech: Speech?
-    var description: String?
+    var name: String
+    var duration: Int
+    var speech: Speech
+    var description: String
 
-    init(id: Int? = nil, name: String? = nil, duration: Int? = nil, speech: Speech? = nil, description: String? = "") {
-
+    init(id: Int? = nil, name: String = "Exercise", duration: Int = 60, speech: Speech = Speech(), description: String = "") {
         if id != nil {
             self.id = id
         } else {
@@ -196,18 +194,9 @@ class Exercise: Codable, Equatable {
         }
 
         self.name = name
-
-        if let duration = duration {
-            self.duration = duration
-        }
-
-        if let speech = speech {
-            self.speech = speech
-        }
-
-        if let description = description {
-            self.description = description
-        }
+        self.duration = duration
+        self.speech = speech
+        self.description = description
     }
 
     static func == (lhs: Exercise, rhs: Exercise) -> Bool {
@@ -215,13 +204,13 @@ class Exercise: Codable, Equatable {
     }
 
     struct Speech: Codable {
-        var start: String?
-        var thirtySecondsLeft: String?
-        var tenSecondsLeft: String?
-        var fiveSecondsLeft: String?
-        var end: String?
+        var start: String
+        var thirtySecondsLeft: String
+        var tenSecondsLeft: String
+        var fiveSecondsLeft: String
+        var end: String
 
-        init(start: String? = "", thirtySecondsLeft: String? = "", tenSecondsLeft: String? = "", fiveSecondsLeft: String? = "", end: String? = "") {
+        init(start: String = "", thirtySecondsLeft: String = "", tenSecondsLeft: String = "", fiveSecondsLeft: String = "", end: String = "") {
             self.start = start
             self.thirtySecondsLeft = thirtySecondsLeft
             self.tenSecondsLeft = tenSecondsLeft
