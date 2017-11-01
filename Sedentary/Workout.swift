@@ -396,10 +396,12 @@ extension Array where Element: Workout {
 
     func refresh() {
         state.workouts = []
-//        state.workouts.save()
-        // This removed "next" workout.
-        // Assign last workout id?
-        self.arrange(exercises: (exercisesUsed: [], exercisesLeft: state.enabledExercises))
+
+        if state.enabledExercises.count > 0 {
+            self.arrange(exercises: (exercisesUsed: [], exercisesLeft: state.enabledExercises))
+        } else {
+            let _ = state.workouts.save()
+        }
     }
 
     private func arrange(exercises: SortedExercisesTuple) {
@@ -430,6 +432,11 @@ extension Array where Element: Workout {
         if sortedExercises.exercisesLeft.count > 0 {
             state.workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: sortedExercises.exercisesLeft))
         } else {
+            guard state.workouts.count > 0 && state.workouts.first!.enabledExercises.count > 0 else {
+                state.workouts = []
+                return
+            }
+
             if let workout = state.workouts.first {
                 workout.next = true
             }
