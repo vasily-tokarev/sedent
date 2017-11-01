@@ -573,7 +573,7 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="Autostart" id="9V8-Na-cJj">
+                            <tableViewSection headerTitle="Workout Complete Speech" id="9V8-Na-cJj">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="UKD-o2-P2q">
                                         <rect key="frame" x="0.0" y="355.5" width="320" height="44"/>
@@ -582,26 +582,52 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Start workout on app launch" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="i5y-hv-hBw">
+                                                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Workout complete" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="zHs-an-cZp">
+                                                    <rect key="frame" x="8" y="5.5" width="304" height="32"/>
+                                                    <nil key="textColor"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                    <textInputTraits key="textInputTraits"/>
+                                                </textField>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="zHs-an-cZp" secondAttribute="trailing" constant="8" id="h5U-xL-YT1"/>
+                                                <constraint firstAttribute="bottom" secondItem="zHs-an-cZp" secondAttribute="bottom" constant="6" id="i3S-1Z-LtS"/>
+                                                <constraint firstItem="zHs-an-cZp" firstAttribute="leading" secondItem="Tjh-KJ-hoj" secondAttribute="leading" constant="8" id="img-Kl-C2w"/>
+                                                <constraint firstItem="zHs-an-cZp" firstAttribute="top" secondItem="Tjh-KJ-hoj" secondAttribute="top" constant="6" id="pAc-Sl-80d"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="Autostart" id="6Oo-eT-bNI">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="mZm-12-eIn">
+                                        <rect key="frame" x="0.0" y="455.5" width="320" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="mZm-12-eIn" id="Rmf-0y-ohx">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Start workout on app launch" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Gig-iE-odu">
                                                     <rect key="frame" x="24" y="17" width="216" height="10"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="HpK-ed-L5Y">
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="kDi-md-ozN">
                                                     <rect key="frame" x="263" y="6" width="51" height="31"/>
                                                     <connections>
-                                                        <action selector="autostartSwitchValueChanged:" destination="Lov-Wo-FbU" eventType="valueChanged" id="Cr8-hN-y1r"/>
+                                                        <action selector="autostartSwitchValueChanged:" destination="Lov-Wo-FbU" eventType="valueChanged" id="7lj-4m-pfT"/>
                                                     </connections>
                                                 </switch>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstAttribute="bottom" secondItem="HpK-ed-L5Y" secondAttribute="bottom" constant="6" id="2eF-UB-BQq"/>
-                                                <constraint firstItem="HpK-ed-L5Y" firstAttribute="top" secondItem="Tjh-KJ-hoj" secondAttribute="top" constant="6" id="EOf-kC-QCu"/>
-                                                <constraint firstItem="i5y-hv-hBw" firstAttribute="leading" secondItem="Tjh-KJ-hoj" secondAttribute="leadingMargin" constant="8" id="UNU-ee-l0b"/>
-                                                <constraint firstAttribute="trailing" secondItem="HpK-ed-L5Y" secondAttribute="trailing" constant="8" id="aAb-iq-Swt"/>
-                                                <constraint firstItem="i5y-hv-hBw" firstAttribute="top" secondItem="Tjh-KJ-hoj" secondAttribute="topMargin" constant="6" id="fYa-8F-EOy"/>
-                                                <constraint firstAttribute="bottomMargin" secondItem="i5y-hv-hBw" secondAttribute="bottom" constant="6" id="weS-Cv-t1H"/>
+                                                <constraint firstItem="Gig-iE-odu" firstAttribute="top" secondItem="Rmf-0y-ohx" secondAttribute="topMargin" constant="6" id="35z-Tl-pwh"/>
+                                                <constraint firstAttribute="bottom" secondItem="kDi-md-ozN" secondAttribute="bottom" constant="6" id="3Ca-ZJ-tHC"/>
+                                                <constraint firstItem="Gig-iE-odu" firstAttribute="leading" secondItem="Rmf-0y-ohx" secondAttribute="leadingMargin" constant="8" id="QxZ-Ep-DFW"/>
+                                                <constraint firstAttribute="trailing" secondItem="kDi-md-ozN" secondAttribute="trailing" constant="8" id="WCN-ZI-T6t"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="Gig-iE-odu" secondAttribute="bottom" constant="6" id="kCY-sM-a5r"/>
+                                                <constraint firstItem="kDi-md-ozN" firstAttribute="top" secondItem="Rmf-0y-ohx" secondAttribute="top" constant="6" id="qwI-dx-rlW"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -621,10 +647,10 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="autostartSwitch" destination="HpK-ed-L5Y" id="Ww9-UT-a4y"/>
                         <outlet property="notificationIntervalStepper" destination="M61-zx-aBL" id="7Gl-jk-3n1"/>
                         <outlet property="notificationIntervalStepperLabel" destination="eUU-OE-axk" id="OGr-YK-EXf"/>
                         <outlet property="notificationTextField" destination="tbR-5h-nRj" id="MZC-rX-dF5"/>
+                        <outlet property="workoutCompleteSpeech" destination="zHs-an-cZp" id="7zY-rr-lYN"/>
                         <outlet property="workoutDurationStepper" destination="Mm1-H5-WMI" id="plS-Mq-6rO"/>
                         <outlet property="workoutDurationStepperLabel" destination="IGb-Ut-YJh" id="lRM-Yz-Thc"/>
                     </connections>

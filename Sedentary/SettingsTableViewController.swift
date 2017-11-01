@@ -19,10 +19,24 @@ class SettingsTableViewController: UITableViewController {
     
     @IBOutlet weak var notificationTextField: UITextField!
     @IBOutlet weak var autostartSwitch: UISwitch!
+    @IBOutlet weak var workoutCompleteSpeech: UITextField!
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // check segue identifier
         // https://medium.com/yay-its-erica/how-to-pass-data-in-an-unwind-segue-swift-3-1c3fa095cde1
+
+        if let notificationText = notificationTextField.text {
+            if !notificationText.isEmpty {
+                settings.notificationText = notificationText
+            }
+        }
+
+        if let workoutCompleteSpeech = workoutCompleteSpeech.text {
+            if !workoutCompleteSpeech.isEmpty {
+                settings.workoutCompleteSpeech = workoutCompleteSpeech
+            }
+        }
+
         state.settings[0] = settings
         let _ = state.settings.save()
         state.workouts.refresh()
@@ -93,7 +107,7 @@ class SettingsTableViewController: UITableViewController {
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 3
+        return 4
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
