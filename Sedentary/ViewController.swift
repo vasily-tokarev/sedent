@@ -20,6 +20,11 @@ class ViewController: UIViewController {
     @IBOutlet weak var exerciseTimerLabel: UILabel!
 
     var workoutCompleted: Bool = false
+    var timer: Timer? = nil {
+        willSet {
+            timer?.invalidate()
+        }
+    }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // TODO: Check the destination.
@@ -38,29 +43,29 @@ class ViewController: UIViewController {
     @IBAction func exerciseNotificationSwitchValueChanged(_ sender: UISwitch) {
         if exerciseNotificationSwitch.isOn {
 //            createNotification()
-            startTimer()
             state.settings[0].notificationSwitchIsOn = true
             state.settings[0].dateNotificationCreated = Date()
+            self.startTimer()
         } else {
+            self.timer?.invalidate()
+            self.timer = nil
             state.settings[0].notificationSwitchIsOn = false
             exerciseTimerLabel.text = "00:00"
             exerciseTimerLabel.textColor = .white
-            timer.invalidate()
         }
         let _ = state.settings.save()
     }
 
-    var timer: Timer = Timer()
 
     func resumeTimer() {
         notifications.createNotification(dateNotificationCreated: state.settings[0].dateNotificationCreated)
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(ViewController.updateTimer), userInfo: nil, repeats: true)
+        self.timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(ViewController.updateTimer), userInfo: nil, repeats: true)
     }
 
     func startTimer() {
         exerciseTimerLabel.textColor = .white
         notifications.createNotification()
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(ViewController.updateTimer), userInfo: nil, repeats: true)
+        self.timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(ViewController.updateTimer), userInfo: nil, repeats: true)
     }
 
 //    func restartTimer() {
@@ -68,10 +73,19 @@ class ViewController: UIViewController {
 //        startTimer()
 //    }
 
+//    func stopTimer() {
+//    }
+
     @objc func updateTimer() throws {
         guard let dateNotificationCreated = notifications.dateNotificationCreated else {
             print("ViewControllerError.dateNotificationCreatedNotSet")
             throw ViewControllerError.dateNotificationCreatedNotSet
+        }
+
+        guard timer != nil else {
+            print("timer is nil")
+            timer?.invalidate()
+            return
         }
 
         let secondsSinceNotificationCreated = Date().timeIntervalSince(dateNotificationCreated)
@@ -81,7 +95,8 @@ class ViewController: UIViewController {
         if secondsSinceNotificationCreated > notifications.notificationInterval {
             exerciseTimerLabel.textColor = .red
             exerciseTimerLabel.text = "00:00"
-            timer.invalidate()
+            self.timer?.invalidate()
+            self.timer = nil
         }
     }
 
@@ -98,7 +113,8 @@ class ViewController: UIViewController {
             startButton.isHidden = false
         }
 
-        if state.settings[0].notificationSwitchIsOn {
+        if state.settings[0].notificationSwitchIsOn && timer != nil {
+            print("resuming timer")
             exerciseNotificationSwitch.isOn = state.settings[0].notificationSwitchIsOn
             resumeTimer()
         }

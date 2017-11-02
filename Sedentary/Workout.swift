@@ -95,7 +95,12 @@ class Coach {
     var totalDuration: Int?
 //    var durationLeft: Int?
 
-    var timer: Timer?
+    var timer: Timer? = nil {
+        willSet {
+            timer?.invalidate()
+        }
+    }
+
     var exerciseStarted: Date?
 
     func speaker(say speech: String) {
