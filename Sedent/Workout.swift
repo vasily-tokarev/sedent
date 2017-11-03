@@ -132,9 +132,9 @@ class Coach {
 
         totalDuration = exercises.duration
 
-        self.startTimer()
         speaker(say: currentExercise.speech.start)
         exerciseStarted = Date()
+        self.startTimer()
     }
 
     @objc func updateTimer() {
