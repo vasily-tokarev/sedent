@@ -77,12 +77,10 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
             let _ = saveImage(image: image, path: imageURL)
         }
 
-        if state.exercises.save() {
-            if state.enabledExercises.delete(exercise: exercise) {
-                state.workouts.refresh()
-                performSegue(withIdentifier: Navigation.Segue.unwindToWorkoutsExercises.identifier, sender: self)
-            }
-        }
+        state.exercises.save()
+        state.enabledExercises.delete(exercise: exercise)
+        state.workouts.refresh()
+        performSegue(withIdentifier: Navigation.Segue.unwindToWorkoutsExercises.identifier, sender: self)
     }
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -109,8 +107,8 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
         navigationItem.rightBarButtonItem = saveButtonItem
 
         formatDuration(value: durationStepper.value)
-        if selectedExerciseIndex != state.exercises.count {
-            currentExercise = state.exercises[selectedExerciseIndex!]
+        if let selectedExerciseIndex = selectedExerciseIndex {
+            currentExercise = state.exercises[selectedExerciseIndex]
             if let exercise = currentExercise {
                 guard let docDir = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true) else {
                     print("ExercisesTableViewController: docDir is not set")

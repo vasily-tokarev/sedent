@@ -67,12 +67,15 @@ enum Navigation {
         enum Section: Int {
             case workouts
             case exercises
+            case newExercise
             var number: Int {
                 switch self {
                 case .workouts:
                     return 0
                 case .exercises:
                     return 1
+                case .newExercise:
+                    return 2
                 }
             }
             var name: String {
@@ -81,6 +84,8 @@ enum Navigation {
                     return "Workouts"
                 case .exercises:
                     return "Exercises"
+                case .newExercise:
+                    return ""
                 }
             }
         }

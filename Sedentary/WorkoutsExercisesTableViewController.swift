@@ -15,6 +15,8 @@ class WorkoutsExercisesTableViewController: UITableViewController {
     let workoutsSectionName: String = Navigation.WorkoutsExercisesTableViewController.Section.workouts.name
     let exercisesSection: Int = Navigation.WorkoutsExercisesTableViewController.Section.exercises.number
     let exercisesSectionName: String = Navigation.WorkoutsExercisesTableViewController.Section.exercises.name
+    let newExerciseSection: Int = Navigation.WorkoutsExercisesTableViewController.Section.newExercise.number
+    let newExerciseSectionName: String = Navigation.WorkoutsExercisesTableViewController.Section.newExercise.name
 
     let worksoutsExercisesToExercisesSegue: String = Navigation.Segue.workoutsExercisesToExercises.identifier
 
@@ -46,19 +48,20 @@ class WorkoutsExercisesTableViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        return 3
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         var numberOfRows: Int = 0
-        if section == workoutsSection {
+        switch section {
+        case workoutsSection:
             numberOfRows = state.enabledExercises.count
-        } else if section == exercisesSection {
-            if state.exercises.count > 0 {
-                numberOfRows = state.exercises.count + 1
-            } else {
-                numberOfRows = 1
-            }
+        case exercisesSection:
+            numberOfRows = state.exercises.count
+        case newExerciseSection:
+            numberOfRows = 1
+        default:
+            break
         }
         return numberOfRows
     }
@@ -71,86 +74,74 @@ class WorkoutsExercisesTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.section == exercisesSection {
-            selectedExerciseIndex = indexPath.row
-            performSegue(withIdentifier: worksoutsExercisesToExercisesSegue, sender: nil)
+        switch indexPath.section {
+            case exercisesSection:
+                selectedExerciseIndex = indexPath.row
+                performSegue(withIdentifier: worksoutsExercisesToExercisesSegue, sender: nil)
+            case newExerciseSection:
+                selectedExerciseIndex = nil
+                performSegue(withIdentifier: worksoutsExercisesToExercisesSegue, sender: nil)
+            default:
+                break
         }
+    }
+
+    override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+        guard indexPath.section != workoutsSection else {
+            return nil
+        }
+        return indexPath
+//        return super.tableView(tableView, willSelectRowAt: indexPath)
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: workoutsExercisesCell, for: indexPath) as! WorkoutsExercisesTableViewCell
-        if indexPath.section == workoutsSection {
-            if state.enabledExercises.count > 0 {
-                cell.update(with: state.enabledExercises[indexPath.row])
-                // Update label with workout.each?.exercises.first.id == enabledExercise  .timeAt
-                // What if there are two of them?
-            }
-        } else {
-            if state.exercises.count > 0 && indexPath.row <= state.exercises.count - 1 {
-                cell.update(with: state.exercises[indexPath.row])
-            }
 
-            if state.exercises.count == 0 {
-                cell.update(with: "New Exercise")
-            }
-
-            if state.exercises.count > 0 && indexPath.row == state.exercises.count {
-                cell.update(with: "New Exercise")
-            }
+        switch indexPath.section {
+        case workoutsSection:
+            cell.update(with: state.enabledExercises[indexPath.row])
+        case exercisesSection:
+            cell.update(with: state.exercises[indexPath.row])
+        case newExerciseSection:
+            cell.update(with: "New Exercise")
+        default:
+            break
         }
         return cell
     }
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if section == workoutsSection {
+        switch section {
+        case workoutsSection:
             return workoutsSectionName
-        } else {
+        case exercisesSection:
             return exercisesSectionName
+        case newExerciseSection:
+            return ""
+        default:
+            return "Unknown Section"
         }
     }
 
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        // TODO: Refactor this.
-        if (indexPath.section == exercisesSection && state.exercises.count == 0) || (indexPath.section == exercisesSection && state.exercises.count > 0 && indexPath.row == state.exercises.count) {
-            return false
-        } else {
-            return true
-        }
-    }
 
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            if indexPath.section == workoutsSection {
+            switch indexPath.section {
+            case workoutsSection:
                 state.enabledExercises.remove(at: indexPath.row)
-                if state.enabledExercises.save() {
-                    state.workouts.refresh()
-                    tableView.deleteRows(at: [indexPath], with: .fade)
-                }
-            } else {
-                let enabledExercisesToDelete = state.enabledExercises.filter { $0.exerciseId == state.exercises[indexPath.row].id}
-                let indicesToDelete: [Int] = enabledExercisesToDelete.map { state.enabledExercises.index(of: $0)! }
-
+            case exercisesSection:
                 state.enabledExercises = state.enabledExercises.filter { $0.exerciseId != state.exercises[indexPath.row].id}
-
-                if state.enabledExercises.save() {
-                    let paths: [IndexPath] = indicesToDelete.map {
-                        return IndexPath(row: $0, section: 0)
-                    }
-                    tableView.deleteRows(at: paths, with: UITableViewRowAnimation.automatic)
-                }
                 state.exercises.remove(at: indexPath.row)
-                if state.exercises.save() {
-                    tableView.deleteRows(at: [indexPath], with: .fade)
-                }
-                state.workouts.refresh()
+                state.exercises.save()
+            default:
+                break
             }
-            tableView.reloadData()
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }
+        state.enabledExercises.saveAndArrangeWorkouts()
+        tableView.reloadData()
     }
 
     // Override to support rearranging the table view.
@@ -166,9 +157,15 @@ class WorkoutsExercisesTableViewController: UITableViewController {
             let exercise = state.exercises[fromIndexPath.row]
             if exercise.duration <= Int(state.settings[0].workoutDurationInSeconds) {
                 state.enabledExercises.insert(EnabledExercise(workoutId: nil, exerciseId: exercise.id!, name: exercise.name), at: to.row)
-                let _ = state.enabledExercises.save()
+                let _ = state.enabledExercises.saveAndArrangeWorkouts()
             }
         case fromExercisesToExercises:
+            print("to.row: \(to.row)")
+            print("state.exercises.count: \(state.exercises.count)")
+            guard to.row < state.exercises.count else {
+                print("new exercise row")
+                return
+            }
             let movedExercise = state.exercises[fromIndexPath.row]
             state.exercises.remove(at: fromIndexPath.row)
             state.exercises.insert(movedExercise, at: to.row)
@@ -177,7 +174,7 @@ class WorkoutsExercisesTableViewController: UITableViewController {
             let movedExercise = state.enabledExercises[fromIndexPath.row]
             state.enabledExercises.remove(at: fromIndexPath.row)
             state.enabledExercises.insert(movedExercise, at: to.row)
-            let _ = state.enabledExercises.save()
+            let _ = state.enabledExercises.saveAndArrangeWorkouts()
         case fromWorkoutsToExercises:
             print("fromWorkoutsToExercises")
                 // Remove workouts[fromIndexPath.row]
@@ -191,6 +188,18 @@ class WorkoutsExercisesTableViewController: UITableViewController {
     // Override to support conditional rearranging of the table view.
     override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the item to be re-orderable.
+        guard indexPath.section != newExerciseSection else {
+            return false
+        }
+        return true
+    }
+
+    // Override to support conditional editing of the table view.
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        // Return false if you do not want the specified item to be editable.
+        guard indexPath.section != newExerciseSection else {
+            return false
+        }
         return true
     }
 
@@ -198,8 +207,4 @@ class WorkoutsExercisesTableViewController: UITableViewController {
 //        return super.tableView(tableView, heightForRowAt: indexPath)
         return 50
     }
-
-//    @IBAction func unwindToWorkoutsExercises(segue: UIStoryboardSegue) {
-//        print("unwinding")
-//    }
 }

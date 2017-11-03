@@ -31,7 +31,7 @@ func firstRun() {
 //        state.settings.append(Settings(notificationInterval: 40.0, workoutDuration: 2.0, notificationText: "It is time to move!", autostart: false))
         state.settings.append(
                 Settings (
-                notificationInterval: 0.2,
+                        notificationInterval: 0.2,
                         workoutDuration: 2.0,
                         notificationText: "It is time to move!",
                         autostart: false,
@@ -90,7 +90,9 @@ class Coach {
     var currentExerciseIndex: Int { return workout.exercises.index(of: currentExercise)! }
     var currentExerciseDuration: Int { return currentExercise.duration }
 //    var currentExerciseDuration: Int { return 3 }
-    var secondsSinceExerciseStarted: Int { return Int(Date().timeIntervalSince(exerciseStarted!)) }
+    var secondsSinceExerciseStarted: Int {
+        return Int(Date().timeIntervalSince(exerciseStarted!))
+    }
     var workout: Workout
     var totalDuration: Int?
 //    var durationLeft: Int?
@@ -136,10 +138,6 @@ class Coach {
     }
 
     @objc func updateTimer() {
-        guard let exerciseStarted = exerciseStarted else {
-            print("Coach.updateTimer(): exerciseStarted is not set.")
-            return
-        }
         let secondsLeft = (currentExerciseDuration - secondsSinceExerciseStarted) % 60
         let minutesLeft = ((currentExerciseDuration - secondsSinceExerciseStarted) / 60)
 
@@ -305,9 +303,9 @@ extension Array where Element: Exercise {
         return state.exercises
     }
 
-    func save() -> Bool {
+    func save() {
         state.exercises = self
-        return manager.save(data: self)
+        let _ = manager.save(data: self)
     }
 
     func findBy(id: Int) -> Exercise {
@@ -329,21 +327,23 @@ extension Array where Element: EnabledExercise {
         return state.enabledExercises
     }
 
-    func save() -> Bool {
+    func saveAndArrangeWorkouts() {
         state.enabledExercises = self
         state.workouts = []
         state.workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: self))
-        // Less code vs exlicity?
-        return manager.save(data: self)
+        let _ = manager.save(data: self)
+//        print("workouts count:")
+//        print(state.workouts.count)
+//        print("next workout: \(state.workouts.next!.description)")
     }
 
 //    func findByExerciseId(id: Int) -> EnabledExercise {
 //        return self.filter { $0.exerciseId == id }[0]
 //    }
 
-    func delete(exercise: Exercise) -> Bool {
+    func delete(exercise: Exercise) {
         state.enabledExercises = state.enabledExercises.filter { $0.exerciseId != exercise.id}
-        return state.enabledExercises.save()
+        state.enabledExercises.saveAndArrangeWorkouts()
     }
 }
 
@@ -351,6 +351,14 @@ typealias SortedExercisesTuple = (exercisesUsed: [EnabledExercise], exercisesLef
 
 extension Array where Element: Workout {
     private var manager: DataManager<Workout> { return DataManager() }
+
+    var next: Workout? {
+        var workout: Workout? = nil
+        if (self.filter { $0.next == true }.count) > 0 {
+            workout = self.filter { $0.next == true }[0]
+        }
+        return workout
+    }
 
     func returnAndAssignNext() -> Workout {
         if (self.filter { $0.next == true }.count) > 0 {
@@ -408,7 +416,7 @@ extension Array where Element: Workout {
 
     private func arrange(exercises: SortedExercisesTuple) {
         // Might recurse if duration is too small.
-        var duration = Int(state.settings[0].workoutDurationInSeconds)
+        var duration = state.settings[0].workoutDurationInSeconds
 
         // Skip exercises with long (> settings) duration.
 
@@ -502,7 +510,12 @@ class Workout: Codable, Equatable {
     }
 
     var description: String {
-        return "Workout: #\(self.id), next?: \(self.next), exercises.count: \(self.exercises.count), enabledExercises.count: \(self.enabledExercises.count)"
+        return "Workout: #\(self.id)" +
+                ", next?: \(self.next)" +
+                ", exercises.count: \(self.exercises.count)" +
+                ", enabledExercises.count: \(self.enabledExercises.count) \n" +
+                "first exercise name: \(self.exercises.first!.name) id: \(self.exercises.first!.id!) \n" +
+                "first enabled exercise name: \(self.enabledExercises.first!.name) exerciseId: \(self.enabledExercises.first!.exerciseId)"
     }
 
     static func == (lhs: Workout, rhs: Workout) -> Bool {
