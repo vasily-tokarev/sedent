@@ -28,7 +28,8 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
     
     @IBAction func durationStepperValueChanged(_ sender: UIStepper) {
         let seconds = Int(durationStepper.value)
-        let (h, m, s) = secondsToHoursMinutesSeconds(seconds: seconds)
+        // Silence the warning with _. It is hours.
+        let (_, m, s) = secondsToHoursMinutesSeconds(seconds: seconds)
         durationLabel.text = String(format: "%02i:%02i", m, s)
 
         // Hide thirtySecondsSpeech
@@ -71,9 +72,9 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
         }
 
         let docDir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-        let imageURL = docDir.appendingPathComponent("\(exercise.name)-\(exercise.id)-0.png")
 
-        if let image = imageView.image {
+        if let image = imageView.image, let exerciseId = exercise.id {
+            let imageURL = docDir.appendingPathComponent("\(exercise.name)-\(exerciseId)-0.png")
             let _ = saveImage(image: image, path: imageURL)
         }
 
@@ -90,7 +91,7 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
 
     func formatDuration(value: Double) {
         let seconds = Int(value)
-        let (h, m, s) = secondsToHoursMinutesSeconds(seconds: seconds)
+        let (_, m, s) = secondsToHoursMinutesSeconds(seconds: seconds)
         durationLabel.text = String(format: "%02i:%02i", m, s)
     }
 
@@ -114,9 +115,14 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
                     print("ExercisesTableViewController: docDir is not set")
                     return
                 }
-                let imageURL = docDir.appendingPathComponent("\(exercise.name)-\(exercise.id)-0.png")
-                if let data = try? Data(contentsOf: imageURL) {
-                    imageView.image = UIImage(data: data)
+                
+                if let exerciseId = exercise.id {
+                    let imageURL = docDir.appendingPathComponent("\(exercise.name)-\(exerciseId)-0.png")
+                    if let data = try? Data(contentsOf: imageURL) {
+                        imageView.image = UIImage(data: data)
+                    }
+                    print("saved")
+                    print(imageURL)
                 }
 
                 nameTextField.text! = exercise.name
@@ -197,7 +203,8 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
                 alertController.addAction(photoLibraryAction)
             }
 
-//            alertController.popoverPresentationController?.sourceView = sender
+//            alertController.popoverPresentationController?.barButtonItem = self.navigationItem.rightBarButtonItem
+            alertController.popoverPresentationController?.sourceView = imageView
             present(alertController, animated: true, completion: nil)
     }
 

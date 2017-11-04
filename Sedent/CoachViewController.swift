@@ -52,10 +52,14 @@ class CoachViewController: UIViewController {
         exerciseDescriptionTextView.text = coach.currentExercise.description
 
         let docDir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-        let imageURL = docDir.appendingPathComponent("\(coach.currentExercise.name)-\(coach.currentExercise.id)-0.png")
-
-        if let data = try? Data(contentsOf: imageURL) {
-            exerciseImageView.image = UIImage(data: data)
+        
+        if let exerciseId = coach.currentExercise.id {
+            let imageURL = docDir.appendingPathComponent("\(coach.currentExercise.name)-\(exerciseId)-0.png")
+            
+            if let data = try? Data(contentsOf: imageURL) {
+                print("got the data")
+                exerciseImageView.image = UIImage(data: data)
+            }
         }
     }
 
