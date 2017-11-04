@@ -75,14 +75,14 @@ class WorkoutsExercisesTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch indexPath.section {
-            case exercisesSection:
-                selectedExerciseIndex = indexPath.row
-                performSegue(withIdentifier: worksoutsExercisesToExercisesSegue, sender: nil)
-            case newExerciseSection:
-                selectedExerciseIndex = nil
-                performSegue(withIdentifier: worksoutsExercisesToExercisesSegue, sender: nil)
-            default:
-                break
+        case exercisesSection:
+            selectedExerciseIndex = indexPath.row
+            performSegue(withIdentifier: worksoutsExercisesToExercisesSegue, sender: nil)
+        case newExerciseSection:
+            selectedExerciseIndex = nil
+            performSegue(withIdentifier: worksoutsExercisesToExercisesSegue, sender: nil)
+        default:
+            break
         }
     }
 
@@ -132,6 +132,21 @@ class WorkoutsExercisesTableViewController: UITableViewController {
                 state.enabledExercises.remove(at: indexPath.row)
             case exercisesSection:
                 state.enabledExercises = state.enabledExercises.filter { $0.exerciseId != state.exercises[indexPath.row].id}
+                let exercise = state.exercises[indexPath.row]
+
+//                let docDir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+//                let imageURL = docDir.appendingPathComponent("\(exercise.name)-\(exercise.id)-0.png")
+
+                if let exerciseId = exercise.id,
+                   let docDir = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true) {
+                    let imageURL = docDir.appendingPathComponent("\(exercise.name)-\(exerciseId)-0.png")
+                    do {
+                        try FileManager.default.removeItem(at: imageURL)
+                    } catch let error as NSError {
+                        print("Error: \(error.domain)")
+                    }
+                }
+
                 state.exercises.remove(at: indexPath.row)
                 state.exercises.save()
             default:

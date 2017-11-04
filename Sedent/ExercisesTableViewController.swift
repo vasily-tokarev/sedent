@@ -25,7 +25,7 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
     @IBOutlet weak var fiveSecondsLeftSpeechTextField: UITextField!
     @IBOutlet weak var endSpeechTextField: UITextField!
     @IBOutlet weak var descriptionTextField: UITextField!
-    
+
     @IBAction func durationStepperValueChanged(_ sender: UIStepper) {
         let seconds = Int(durationStepper.value)
         // Silence the warning with _. It is hours.
@@ -71,9 +71,11 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
             state.exercises.append(exercise)
         }
 
-        let docDir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
 
-        if let image = imageView.image, let exerciseId = exercise.id {
+
+        if let image = imageView.image,
+           let exerciseId = exercise.id,
+           let docDir = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true) {
             let imageURL = docDir.appendingPathComponent("\(exercise.name)-\(exerciseId)-0.png")
             let _ = saveImage(image: image, path: imageURL)
         }
@@ -115,14 +117,12 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
                     print("ExercisesTableViewController: docDir is not set")
                     return
                 }
-                
+
                 if let exerciseId = exercise.id {
                     let imageURL = docDir.appendingPathComponent("\(exercise.name)-\(exerciseId)-0.png")
                     if let data = try? Data(contentsOf: imageURL) {
                         imageView.image = UIImage(data: data)
                     }
-                    print("saved")
-                    print(imageURL)
                 }
 
                 nameTextField.text! = exercise.name
@@ -177,12 +177,12 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
 
 //    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     @objc func imageViewTapped(tapGestureRecognizer: UITapGestureRecognizer) {
-            let alertController = UIAlertController(title: "Choose Image Source", message: nil, preferredStyle: .actionSheet)
-            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-            alertController.addAction(cancelAction)
+        let alertController = UIAlertController(title: "Choose Image Source", message: nil, preferredStyle: .actionSheet)
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        alertController.addAction(cancelAction)
 
-            let imagePicker = UIImagePickerController()
-            imagePicker.delegate = self
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
 
 //            if UIImagePickerController.isSourceTypeAvailable(.camera) {
 //                print("camera available")
@@ -194,18 +194,18 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
 //                alertController.addAction(cameraAction)
 //            }
 
-            if UIImagePickerController.isSourceTypeAvailable(.photoLibrary) {
-                let photoLibraryAction = UIAlertAction(title: "Photo Library", style: .default, handler: {
-                    action in
-                    imagePicker.sourceType = .photoLibrary
-                    self.present(imagePicker, animated: true, completion: nil)
-                })
-                alertController.addAction(photoLibraryAction)
-            }
+        if UIImagePickerController.isSourceTypeAvailable(.photoLibrary) {
+            let photoLibraryAction = UIAlertAction(title: "Photo Library", style: .default, handler: {
+                action in
+                imagePicker.sourceType = .photoLibrary
+                self.present(imagePicker, animated: true, completion: nil)
+            })
+            alertController.addAction(photoLibraryAction)
+        }
 
 //            alertController.popoverPresentationController?.barButtonItem = self.navigationItem.rightBarButtonItem
-            alertController.popoverPresentationController?.sourceView = imageView
-            present(alertController, animated: true, completion: nil)
+        alertController.popoverPresentationController?.sourceView = imageView
+        present(alertController, animated: true, completion: nil)
     }
 
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
