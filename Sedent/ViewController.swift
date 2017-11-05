@@ -68,24 +68,10 @@ class ViewController: UIViewController {
         self.timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(ViewController.updateTimer), userInfo: nil, repeats: true)
     }
 
-//    func restartTimer() {
-//        timer.invalidate()
-//        startTimer()
-//    }
-
-//    func stopTimer() {
-//    }
-
     @objc func updateTimer() throws {
         guard let dateNotificationCreated = notifications.dateNotificationCreated else {
             print("ViewControllerError.dateNotificationCreatedNotSet")
             throw ViewControllerError.dateNotificationCreatedNotSet
-        }
-
-        guard timer != nil else {
-            print("timer is nil")
-            timer?.invalidate()
-            return
         }
 
         let secondsSinceNotificationCreated = Date().timeIntervalSince(dateNotificationCreated)
@@ -113,20 +99,15 @@ class ViewController: UIViewController {
             startButton.isHidden = false
         }
 
-        if state.settings[0].notificationSwitchIsOn && timer != nil {
-            print("resuming timer")
+        if state.settings[0].notificationSwitchIsOn {
             exerciseNotificationSwitch.isOn = state.settings[0].notificationSwitchIsOn
             resumeTimer()
         }
 
         if self.workoutCompleted && exerciseNotificationSwitch.isOn {
-            print("workout completed, switch is on, starting the timer")
             startTimer()
         }
         self.workoutCompleted = false
-
-//        startTimer()
-//        print("timer started")
 
         let nav = self.navigationController?.navigationBar
 //        nav?.barStyle = UIBarStyle.Black
