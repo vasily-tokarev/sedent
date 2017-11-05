@@ -223,15 +223,23 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="199.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Image Placeholder" translatesAutoresizingMaskIntoConstraints="NO" id="IYs-xn-EaU">
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="IYs-xn-EaU">
                                                     <rect key="frame" x="0.0" y="0.0" width="375" height="199.5"/>
                                                 </imageView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="TAP TO ADD" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EWq-2o-4Un">
+                                                    <rect key="frame" x="111" y="83" width="154" height="33.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="28"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="bottom" secondItem="IYs-xn-EaU" secondAttribute="bottom" id="B3p-vC-Wa0"/>
                                                 <constraint firstAttribute="trailing" secondItem="IYs-xn-EaU" secondAttribute="trailing" id="IoM-9Z-tcy"/>
                                                 <constraint firstItem="IYs-xn-EaU" firstAttribute="leading" secondItem="z5d-1t-SnM" secondAttribute="leading" id="Y5h-VA-w0c"/>
                                                 <constraint firstItem="IYs-xn-EaU" firstAttribute="top" secondItem="z5d-1t-SnM" secondAttribute="top" id="hed-bX-dzn"/>
+                                                <constraint firstItem="EWq-2o-4Un" firstAttribute="centerY" secondItem="z5d-1t-SnM" secondAttribute="centerY" id="kom-JM-zyj"/>
+                                                <constraint firstItem="EWq-2o-4Un" firstAttribute="centerX" secondItem="z5d-1t-SnM" secondAttribute="centerX" id="mEW-kd-mMA"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -327,11 +335,11 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="Gdi-qt-BdK">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" selectionStyle="default" indentationWidth="10" id="Gdi-qt-BdK">
                                         <rect key="frame" x="0.0" y="687.5" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Gdi-qt-BdK" id="XrS-Eh-GEW">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Back to work" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="2A3-Qr-4WQ">
@@ -353,11 +361,11 @@
                             </tableViewSection>
                             <tableViewSection headerTitle="Description" id="baW-Ak-Vha">
                                 <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="PRA-PX-pus">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" selectionStyle="default" indentationWidth="10" id="PRA-PX-pus">
                                         <rect key="frame" x="0.0" y="787.5" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="PRA-PX-pus" id="Gxj-Hf-0ho">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="wuF-rc-9I8">
@@ -392,6 +400,7 @@
                         <outlet property="imageView" destination="IYs-xn-EaU" id="gqP-zT-CVV"/>
                         <outlet property="nameTextField" destination="XSW-v7-ZUK" id="ehe-H9-kbv"/>
                         <outlet property="startSpeechTextField" destination="jjl-kX-z0W" id="GPJ-XK-YlY"/>
+                        <outlet property="tapToAddLabel" destination="EWq-2o-4Un" id="qYB-BB-7EM"/>
                         <outlet property="tenSecondsLeftSpeechTextField" destination="Ynp-qp-Zvs" id="rnJ-3N-25X"/>
                         <outlet property="thirtySecondsLeftSpeechTextField" destination="4W9-wp-f3G" id="4Kf-GP-HK9"/>
                         <segue destination="r7h-q5-pbT" kind="unwind" identifier="unwindToWorkoutsExercises" unwindAction="unwindToWorkoutsExercisesWithSegue:" id="NQZ-Ke-Enm"/>
@@ -400,7 +409,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="f4W-Lj-Dgq" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="r7h-q5-pbT" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="2974" y="113"/>
+            <point key="canvasLocation" x="2973.5999999999999" y="112.89355322338831"/>
         </scene>
         <!--Coach View Controller-->
         <scene sceneID="12g-wU-WIr">
@@ -682,7 +691,4 @@
             <point key="canvasLocation" x="444" y="114"/>
         </scene>
     </scenes>
-    <resources>
-        <image name="Image Placeholder" width="512" height="384"/>
-    </resources>
 </document>

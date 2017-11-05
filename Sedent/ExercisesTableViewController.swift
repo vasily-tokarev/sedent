@@ -12,6 +12,7 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
     var selectedExerciseIndex: Int?
     var currentExercise: Exercise?
 
+    @IBOutlet weak var tapToAddLabel: UILabel!
     let imageSection: Int = Navigation.ExercisesTableViewController.Section.image.number
 
     @IBOutlet weak var nameTextField: UITextField!
@@ -122,6 +123,7 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
                     let imageURL = docDir.appendingPathComponent("\(exercise.name)-\(exerciseId)-0.png")
                     if let data = try? Data(contentsOf: imageURL) {
                         imageView.image = UIImage(data: data)
+                        tapToAddLabel.isHidden = true
                     }
                 }
 
@@ -212,6 +214,7 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
         if let selectedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
             imageView.image = selectedImage
             dismiss(animated: true, completion: nil)
+            tapToAddLabel.isHidden = true
         }
     }
 }
