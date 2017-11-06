@@ -41,7 +41,6 @@ func firstRun() {
         )
         let _ = state.settings.save()
     }
-    // arrange workouts and add default exercises
 }
 
 struct Formatter: Codable {
@@ -196,6 +195,7 @@ class Coach {
 
                 if self.secondsSinceExerciseStarted >= self.currentExerciseDuration && self.currentExercise.exercise == self.workout.exercises.last {
                     // TODO: Spoken?
+                    self.speaker(say: state.settings[0].workoutCompleteSpeech)
                 }
             default:
                 break

@@ -169,7 +169,7 @@ class ExercisesTableViewController: UITableViewController, UIImagePickerControll
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
 
-        // TODO: Enum! I don't even know what it is.
+        // TODO: Enum! That's probably the speech section.
         if section == 3 {
             return 5
         } else {

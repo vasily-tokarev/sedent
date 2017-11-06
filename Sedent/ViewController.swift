@@ -86,7 +86,8 @@ class ViewController: UIViewController {
         }
     }
 
-    @objc func tapFunction(sender:UITapGestureRecognizer) {
+    @objc func tapFunction(sender: UITapGestureRecognizer) {
+        // TODO: Enum.
         performSegue(withIdentifier: "ViewToTimePicker", sender: nil)
     }
 
