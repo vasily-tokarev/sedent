@@ -48,16 +48,15 @@ class CoachViewController: UIViewController {
     }
 
     func updateView() {
-        exerciseNameLabel.text = coach.currentExercise.name
-        exerciseDescriptionTextView.text = coach.currentExercise.description
+        exerciseNameLabel.text = coach.currentExercise.exercise.name
+        exerciseDescriptionTextView.text = coach.currentExercise.exercise.description
 
         let docDir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         
-        if let exerciseId = coach.currentExercise.id {
-            let imageURL = docDir.appendingPathComponent("\(coach.currentExercise.name)-\(exerciseId)-0.png")
+        if let exerciseId = coach.currentExercise.exercise.id {
+            let imageURL = docDir.appendingPathComponent("\(coach.currentExercise.exercise.name)-\(exerciseId)-0.png")
             
             if let data = try? Data(contentsOf: imageURL) {
-                print("got the data")
                 exerciseImageView.image = UIImage(data: data)
             }
         }

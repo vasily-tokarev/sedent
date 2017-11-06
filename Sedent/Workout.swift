@@ -81,13 +81,27 @@ class Settings: Codable {
 }
 
 class Coach {
+    struct CurrentExercise {
+        let exercise: Exercise
+
+        var startSpoken: Bool = false
+        var endSpoken: Bool = false
+        var thirtySecondsLeftSpoken: Bool = false
+        var tenSecondsLeftSpoken: Bool = false
+        var fiveSecondsLeftSpoken: Bool = false
+
+        init(exercise: Exercise) {
+            self.exercise = exercise
+        }
+    }
+
     var coachViewDelegate: CoachViewController?
     var mainViewDelegate: ViewController?
     let speechSynthesizer: AVSpeechSynthesizer = AVSpeechSynthesizer()
     var exercises: [Exercise] { return workout.exercises }
-    var currentExercise: Exercise
-    var currentExerciseIndex: Int { return workout.exercises.index(of: currentExercise)! }
-    var currentExerciseDuration: Int { return currentExercise.duration }
+    var currentExercise: CurrentExercise
+    var currentExerciseIndex: Int { return workout.exercises.index(of: currentExercise.exercise)! }
+    var currentExerciseDuration: Int { return currentExercise.exercise.duration }
 //    var currentExerciseDuration: Int { return 3 }
     var secondsSinceExerciseStarted: Int {
         return Int(Date().timeIntervalSince(exerciseStarted!))
@@ -125,58 +139,81 @@ class Coach {
 
     init() {
         self.workout = state.workouts.returnAndAssignNext()
-        self.currentExercise = workout.exercises.first!
+        currentExercise = CurrentExercise(exercise: workout.exercises.first!)
 
         notifications.center.removeAllDeliveredNotifications()
 
         totalDuration = exercises.duration
 
-        speaker(say: currentExercise.speech.start)
+        speaker(say: currentExercise.exercise.speech.start)
         exerciseStarted = Date()
         self.startTimer()
     }
 
     @objc func updateTimer() {
-        let secondsLeft = (currentExerciseDuration - secondsSinceExerciseStarted) % 60
-        let minutesLeft = ((currentExerciseDuration - secondsSinceExerciseStarted) / 60)
+        let secondsLeft = (self.currentExerciseDuration - self.secondsSinceExerciseStarted) % 60
+        let minutesLeft = ((self.currentExerciseDuration - self.secondsSinceExerciseStarted) / 60)
 
-        if secondsLeft < 0 {
-            self.coachViewDelegate?.updateLabel(with: "0:00")
-        } else {
-            self.coachViewDelegate?.updateLabel(with: String(format: "%02i:%02i", Int(minutesLeft), Int(secondsLeft)))
-        }
-
-        switch secondsLeft {
-        case 30:
-            speaker(say: currentExercise.speech.thirtySecondsLeft)
-        case 10:
-            speaker(say: currentExercise.speech.tenSecondsLeft)
-        case 5:
-            speaker(say: currentExercise.speech.fiveSecondsLeft)
-        case 0:
-            speaker(say: currentExercise.speech.end)
-            if secondsSinceExerciseStarted >= currentExerciseDuration && currentExercise == workout.exercises.last {
-                speaker(say: state.settings[0].workoutCompleteSpeech)
-            }
-        default:
-            break
-        }
-
-        if secondsSinceExerciseStarted > currentExerciseDuration {
-            // Time is up, complete the exercise.
-            if currentExercise == workout.exercises.last {
-                // perform last one and quit
-                self.timer!.invalidate()
-                coachViewDelegate?.performSegueToReturnBack()
-//                mainViewDelegate?.workoutCompleted = true
+        // It runs on the main queue by default, doesn't it?
+        DispatchQueue.main.async {
+            if secondsLeft < 0 {
+                self.coachViewDelegate?.updateLabel(with: "0:00")
             } else {
-                self.currentExercise = workout.exercises[self.currentExerciseIndex+1]
-                coachViewDelegate!.exerciseChanged()
+                self.coachViewDelegate?.updateLabel(with: String(format: "%02i:%02i", Int(minutesLeft), Int(secondsLeft)))
+            }
+        }
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            switch secondsLeft {
+            case 30:
+                if self.currentExercise.thirtySecondsLeftSpoken {
+                    break
+                } else {
+                    self.speaker(say: self.currentExercise.exercise.speech.thirtySecondsLeft)
+                    self.currentExercise.thirtySecondsLeftSpoken = true
+                }
+            case 10:
+                if self.currentExercise.tenSecondsLeftSpoken {
+                    break
+                } else {
+                    self.speaker(say: self.currentExercise.exercise.speech.tenSecondsLeft)
+                    self.currentExercise.tenSecondsLeftSpoken = true
+                }
+            case 5:
+                if self.currentExercise.fiveSecondsLeftSpoken {
+                    break
+                } else {
+                    self.speaker(say: self.currentExercise.exercise.speech.fiveSecondsLeft)
+                    self.currentExercise.fiveSecondsLeftSpoken = true
+                }
+            case 0:
+                if self.currentExercise.endSpoken {
+                    break
+                } else {
+                    self.speaker(say: self.currentExercise.exercise.speech.end)
+                    self.currentExercise.endSpoken = true
+                }
+
+                if self.secondsSinceExerciseStarted >= self.currentExerciseDuration && self.currentExercise.exercise == self.workout.exercises.last {
+                    // TODO: Spoken?
+                }
+            default:
+                break
+            }
+        }
+
+        if self.secondsSinceExerciseStarted > self.currentExerciseDuration {
+            if self.currentExercise.exercise == self.workout.exercises.last {
+                self.timer!.invalidate()
+                self.coachViewDelegate?.performSegueToReturnBack()
+            } else {
+                self.currentExercise = CurrentExercise(exercise: self.workout.exercises[self.currentExerciseIndex + 1])
+                self.coachViewDelegate!.exerciseChanged()
                 self.exerciseStarted = Date()
 
                 self.timer!.invalidate()
                 self.startTimer()
-                speaker(say: currentExercise.speech.start)
+                self.speaker(say: self.currentExercise.exercise.speech.start)
             }
         }
     }
@@ -197,10 +234,11 @@ class Exercise: Codable, Equatable, HasId {
         if id != nil {
             self.id = id
         } else {
-            var suggestedId = state.enabledExercises.count + 1
-            while state.enabledExercises.findBy(id: suggestedId) != nil {
+            var suggestedId = state.exercises.count + 1
+            while state.exercises.findBy(id: suggestedId) != nil {
                 suggestedId += 1
             }
+            print("suggestedId: \(suggestedId)")
             self.id = suggestedId
         }
 
@@ -514,8 +552,8 @@ class Workout: Codable, Equatable, HasId {
                 ", next?: \(self.next)" +
                 ", exercises.count: \(self.exercises.count)" +
                 ", enabledExercises.count: \(self.enabledExercises.count) \n" +
-            "first exercise name: \(self.exercises.first?.name ?? "unknown") id: \(self.exercises.first?.id ?? 0) \n" +
-        "first enabled exercise name: \(self.enabledExercises.first?.name ?? "unknown") exerciseId: \(self.enabledExercises.first?.exerciseId ?? 0)"
+                "first exercise name: \(self.exercises.first?.name ?? "unknown") id: \(self.exercises.first?.id ?? 0) \n" +
+                "first enabled exercise name: \(self.enabledExercises.first?.name ?? "unknown") exerciseId: \(self.enabledExercises.first?.exerciseId ?? 0)"
     }
 
     static func == (lhs: Workout, rhs: Workout) -> Bool {
