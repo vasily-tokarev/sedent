@@ -30,7 +30,7 @@ func firstRun() {
         state.settings = []
         state.settings.append(
                 Settings (
-                        notificationInterval: 0.2,
+                        notificationInterval: 0.1,
                         workoutDuration: 2.0,
                         notificationText: "It is time to move!",
                         autostart: false,
@@ -510,12 +510,12 @@ class Workout: Codable, Equatable, HasId {
     }
 
     var description: String {
-        return "Workout: #\(self.id)" +
+        return "Workout: #\(self.id ?? 0)" +
                 ", next?: \(self.next)" +
                 ", exercises.count: \(self.exercises.count)" +
                 ", enabledExercises.count: \(self.enabledExercises.count) \n" +
-                "first exercise name: \(self.exercises.first!.name) id: \(self.exercises.first!.id!) \n" +
-                "first enabled exercise name: \(self.enabledExercises.first!.name) exerciseId: \(self.enabledExercises.first!.exerciseId)"
+            "first exercise name: \(self.exercises.first?.name ?? "unknown") id: \(self.exercises.first?.id ?? 0) \n" +
+        "first enabled exercise name: \(self.enabledExercises.first?.name ?? "unknown") exerciseId: \(self.enabledExercises.first?.exerciseId ?? 0)"
     }
 
     static func == (lhs: Workout, rhs: Workout) -> Bool {
