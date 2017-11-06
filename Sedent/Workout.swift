@@ -28,7 +28,6 @@ var state = State()
 func firstRun() {
     if state.settings.count == 0 {
         state.settings = []
-//        state.settings.append(Settings(notificationInterval: 40.0, workoutDuration: 2.0, notificationText: "It is time to move!", autostart: false))
         state.settings.append(
                 Settings (
                         notificationInterval: 0.2,
@@ -183,14 +182,11 @@ class Coach {
     }
 
     func startTimer() {
-        if self.timer != nil {
-            self.timer!.invalidate()
-        } // or just invalidate it in any case?
         self.timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateTimer), userInfo: nil, repeats: true)
     }
 }
 
-class Exercise: Codable, Equatable {
+class Exercise: Codable, Equatable, HasId {
     let id: Int?
     var name: String
     var duration: Int
@@ -201,11 +197,11 @@ class Exercise: Codable, Equatable {
         if id != nil {
             self.id = id
         } else {
-            if state.exercises.count > 0 {
-                self.id = state.exercises.count + 1
-            } else {
-                self.id = 0
+            var suggestedId = state.enabledExercises.count + 1
+            while state.enabledExercises.findBy(id: suggestedId) != nil {
+                suggestedId += 1
             }
+            self.id = suggestedId
         }
 
         self.name = name
@@ -279,6 +275,22 @@ struct DataManager<Element> {
             return false
         }
     }
+
+}
+
+protocol HasId {
+    var id: Int? { get }
+}
+
+extension Array where Element: HasId {
+    func findBy(id: Int) -> Element? {
+        let found = self.filter { $0.id == id }
+        if found.count > 0 {
+            return found[0]
+        } else {
+            return nil
+        }
+    }
 }
 
 extension Array where Element: Settings {
@@ -308,10 +320,6 @@ extension Array where Element: Exercise {
         let _ = manager.save(data: self)
     }
 
-    func findBy(id: Int) -> Exercise {
-        return self.filter { $0.id == id }[0]
-    }
-
     var duration: Int {
         return self.reduce(0, { duration, exercise in
             return exercise.duration + duration
@@ -332,9 +340,6 @@ extension Array where Element: EnabledExercise {
         state.workouts = []
         state.workouts.arrange(exercises: (exercisesUsed: [], exercisesLeft: self))
         let _ = manager.save(data: self)
-//        print("workouts count:")
-//        print(state.workouts.count)
-//        print("next workout: \(state.workouts.next!.description)")
     }
 
 //    func findByExerciseId(id: Int) -> EnabledExercise {
@@ -395,15 +400,6 @@ extension Array where Element: Workout {
         return manager.save(data: self)
     }
 
-    func findBy(id: Int) -> Workout? {
-        let workouts: [Workout?] = self.filter { $0.id == id }
-        if let workout = workouts[0] {
-            return workout
-        } else {
-            return nil
-        }
-    }
-
     func refresh() {
         state.workouts = []
 
@@ -455,8 +451,8 @@ extension Array where Element: Workout {
     }
 }
 
-class EnabledExercise: Codable, Equatable {
-    let id: Int
+class EnabledExercise: Codable, Equatable, HasId {
+    let id: Int?
     let exerciseId: Int
     var workoutId: Int?
     let name: String
@@ -477,7 +473,11 @@ class EnabledExercise: Codable, Equatable {
             self.workoutId = workoutId
         }
         self.name = name
-        self.id = state.enabledExercises.count + 1
+        var suggestedId = state.enabledExercises.count + 1
+        while state.enabledExercises.findBy(id: suggestedId) != nil {
+            suggestedId += 1
+        }
+        self.id = suggestedId
     }
 
     static func == (lhs: EnabledExercise, rhs: EnabledExercise) -> Bool {
@@ -485,8 +485,8 @@ class EnabledExercise: Codable, Equatable {
     }
 }
 
-class Workout: Codable, Equatable {
-    let id: Int
+class Workout: Codable, Equatable, HasId {
+    let id: Int?
     var next: Bool = false
     var enabledExercises: [EnabledExercise]
     var exercises: [Exercise] {
@@ -526,8 +526,11 @@ class Workout: Codable, Equatable {
         // https://stackoverflow.com/questions/32332985/how-to-use-audio-in-ios-application-with-swift-2
         self.next = next
         self.enabledExercises = enabledExercises
-//        self.exercises = exercises
-        self.id = state.workouts.count + 1
+        var suggestedId = state.workouts.count + 1
+        while state.workouts.findBy(id: suggestedId) != nil {
+            suggestedId += 1
+        }
+        self.id = suggestedId
 
         self.enabledExercises.forEach { exercise in
             exercise.workoutId = self.id
