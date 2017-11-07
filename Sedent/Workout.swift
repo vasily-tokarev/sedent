@@ -40,6 +40,90 @@ func firstRun() {
                 )
         )
         let _ = state.settings.save()
+
+        let image = UIImage(named: "1-leg-raise")
+
+        func saveImage(image: UIImage, path: URL ) {
+            let pngImageData = UIImagePNGRepresentation(image)
+            try? pngImageData!.write(to: path)
+        }
+
+        let exercises: [(id: Int, name: String, duration: Int, image: String, description: String, startSpeech: String, thirtySecondsLeftSpeech: String, tenSecondsLeftSpeech: String, fiveSecondsLeftSpeech: String, endSpeech: String)] = [
+            (id: 1, name: "Leg Raise",
+                    duration: 60,
+                    image: "leg-raise-1.png",
+                    description: "Leg Raise description",
+                    startSpeech: "leg start speech",
+                    thirtySecondsLeftSpeech: "leg 30",
+                    tenSecondsLeftSpeech: "leg 10",
+                    fiveSecondsLeftSpeech: "leg 5",
+                    endSpeech: "leg end"),
+            (id: 2,
+                    name: "Plank",
+                    duration: 60,
+                    image: "plank-2.png",
+                    description: "Plank description",
+                    startSpeech: "plank start speech",
+                    thirtySecondsLeftSpeech: "plank 30",
+                    tenSecondsLeftSpeech: "plank 10",
+                    fiveSecondsLeftSpeech: "plank 5",
+                    endSpeech: "plank end"),
+            (id: 3,
+                    name: "Run In Place",
+                    duration: 60,
+                    image: "running-3.png",
+                    description: "Run description",
+                    thirtySecondsLeftSpeech: "run 30",
+                    tenSecondsLeftSpeech: "run 10",
+                    fiveSecondsLeftSpeech: "run 5",
+                    endSpeech: "run end",
+                    startSpeech: "running start speech"),
+            (id: 4,
+                    name: "Surya Namaskar",
+                    duration: 60,
+                    image: "surya-namaskar-4.png",
+                    description: "A set of 12 yoga asanas (postures) that provide a good cardiovascular workout. Literally translated to sun salutation, these postures are a good way to keep the body in shape and the mind calm and healthy.",
+                    startSpeech: "Surya start speech",
+                    thirtySecondsLeftSpeech: "surya 30",
+                    tenSecondsLeftSpeech: "surya 10",
+                    fiveSecondsLeftSpeech: "surya 5",
+                    endSpeech: "surya end") // duration
+        ]
+
+        exercises.forEach {
+            if let image = UIImage(named: $0.image),
+//           let docDir = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true) {
+            // TODO: `create: true` or `false`? Make it global? Appropriate?
+               let docDir = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false) {
+
+                let imageURL = docDir.appendingPathComponent("\($0.name)-\($0.id)-0.png")
+                let _ = saveImage(image: image, path: imageURL)
+
+                state.exercises.append(
+                        Exercise(id: $0.id,
+                                name: $0.name,
+                                duration: $0.duration,
+                                speech: Exercise.Speech(
+                                        start: $0.startSpeech,
+                                        thirtySecondsLeft: $0.thirtySecondsLeftSpeech,
+                                        tenSecondsLeft: $0.tenSecondsLeftSpeech,
+                                        fiveSecondsLeft: $0.fiveSecondsLeftSpeech,
+                                        end: $0.endSpeech),
+                                description: $0.description)
+                )
+            }
+        }
+
+        state.exercises.save()
+        // EnabledExercise + Re-arrange
+
+//        state.exercises.append(Exercise(id: 1, name: "Leg Raise", duration: 60, speech: Exercise.Speech(start: "start"), description: "hello"))
+
+//        init(start: String = "", thirtySecondsLeft: String = "", tenSecondsLeft: String = "", fiveSecondsLeft: String = "", end: String = "") {
+//        init(id: Int? = nil, name: String = "Exercise", duration: Int = 60, speech: Speech = Speech(), description: String = "") {
+
+
+        let _ = state.settings.save()
     }
 }
 

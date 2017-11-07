@@ -49,6 +49,7 @@ class ViewController: UIViewController {
         } else {
             self.timer?.invalidate()
             self.timer = nil
+            notifications.center.removeAllPendingNotificationRequests()
             state.settings[0].notificationSwitchIsOn = false
             exerciseTimerLabel.text = "00:00"
             exerciseTimerLabel.textColor = .white
