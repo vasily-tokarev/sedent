@@ -21,7 +21,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        state.enabledExercises.save()
 
         UINavigationBar.appearance().barTintColor = UIColor.orange
-        UINavigationBar.appearance().tintColor = UIColor.orange
+//        UINavigationBar.appearance().tintColor = UIColor.orange
+        UINavigationBar.appearance().tintColor = UIColor.white
         UINavigationBar.appearance().titleTextAttributes = [NSAttributedStringKey.foregroundColor:UIColor.white]
 
         firstRun()

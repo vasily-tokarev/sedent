@@ -111,10 +111,10 @@ class ViewController: UIViewController {
         }
         self.workoutCompleted = false
 
-        let nav = self.navigationController?.navigationBar
+//        let nav = self.navigationController?.navigationBar
 //        nav?.barStyle = UIBarStyle.Black
-        nav?.tintColor = UIColor.white
-        nav?.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.white]
+//        nav?.tintColor = UIColor.white
+//        nav?.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.white]
     }
 
     override func viewDidLoad() {
