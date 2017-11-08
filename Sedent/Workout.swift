@@ -188,8 +188,10 @@ class Coach {
     var exercises: [Exercise] { return workout.exercises }
     var currentExercise: CurrentExercise
     var currentEnabledExercise: EnabledExercise
-    var currentExerciseIndex: Int { return workout.exercises.index(of: currentExercise.exercise)! }
-    var currentEnabledExerciseIndex: Int { return workout.enabledExercises.index(of: currentEnabledExercise)! }
+//    var currentExerciseIndex: Int { return workout.exercises.index(of: currentExercise.exercise)! }
+//    var currentEnabledExerciseIndex: Int { return workout.enabledExercises.index(of: currentEnabledExercise)! }
+    var currentExerciseIndex: Int
+    var currentEnabledExerciseIndex: Int
     var currentExerciseDuration: Int { return currentExercise.exercise.duration }
 //    var currentExerciseDuration: Int { return 3 }
     var secondsSinceExerciseStarted: Int {
@@ -228,8 +230,12 @@ class Coach {
 
     init() {
         self.workout = state.workouts.returnAndAssignNext()
+
         currentExercise = CurrentExercise(exercise: workout.exercises.first!)
+        currentExerciseIndex = workout.exercises.index(of: currentExercise.exercise)!
+
         currentEnabledExercise = workout.enabledExercises.first!
+        currentEnabledExerciseIndex = workout.enabledExercises.index(of: currentEnabledExercise)!
 
         notifications.center.removeAllDeliveredNotifications()
 
@@ -304,6 +310,9 @@ class Coach {
             } else {
                 self.currentExercise = CurrentExercise(exercise: self.workout.exercises[self.currentExerciseIndex + 1])
                 self.currentEnabledExercise = self.workout.enabledExercises[self.currentEnabledExerciseIndex + 1]
+
+                self.currentExerciseIndex += 1
+                self.currentEnabledExerciseIndex += 1
 
                 self.coachViewDelegate!.exerciseChanged()
                 self.exerciseStarted = Date()
