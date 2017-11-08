@@ -187,7 +187,9 @@ class Coach {
     let speechSynthesizer: AVSpeechSynthesizer = AVSpeechSynthesizer()
     var exercises: [Exercise] { return workout.exercises }
     var currentExercise: CurrentExercise
+    var currentEnabledExercise: EnabledExercise
     var currentExerciseIndex: Int { return workout.exercises.index(of: currentExercise.exercise)! }
+    var currentEnabledExerciseIndex: Int { return workout.enabledExercises.index(of: currentEnabledExercise)! }
     var currentExerciseDuration: Int { return currentExercise.exercise.duration }
 //    var currentExerciseDuration: Int { return 3 }
     var secondsSinceExerciseStarted: Int {
@@ -227,6 +229,7 @@ class Coach {
     init() {
         self.workout = state.workouts.returnAndAssignNext()
         currentExercise = CurrentExercise(exercise: workout.exercises.first!)
+        currentEnabledExercise = workout.enabledExercises.first!
 
         notifications.center.removeAllDeliveredNotifications()
 
@@ -282,7 +285,8 @@ class Coach {
                         self.currentExercise.endSpoken = true
                     }
 
-                    if self.secondsSinceExerciseStarted >= self.currentExerciseDuration && self.currentExercise.exercise == self.workout.exercises.last {
+//                    if self.secondsSinceExerciseStarted >= self.currentExerciseDuration && self.currentExercise.exercise == self.workout.exercises.last {
+                    if self.secondsSinceExerciseStarted >= self.currentExerciseDuration && self.currentEnabledExercise == self.workout.enabledExercises.last {
                         // TODO: Spoken?
                         self.speaker(say: state.settings[0].workoutCompleteSpeech)
                     }
@@ -293,11 +297,14 @@ class Coach {
         }
 
         if self.secondsSinceExerciseStarted > self.currentExerciseDuration {
-            if self.currentExercise.exercise == self.workout.exercises.last {
+//            if self.currentExercise.exercise == self.workout.exercises.last {
+            if self.currentEnabledExercise == self.workout.enabledExercises.last {
                 self.timer!.invalidate()
                 self.coachViewDelegate?.performSegueToReturnBack()
             } else {
                 self.currentExercise = CurrentExercise(exercise: self.workout.exercises[self.currentExerciseIndex + 1])
+                self.currentEnabledExercise = self.workout.enabledExercises[self.currentEnabledExerciseIndex + 1]
+
                 self.coachViewDelegate!.exerciseChanged()
                 self.exerciseStarted = Date()
 
