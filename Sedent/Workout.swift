@@ -41,8 +41,6 @@ func firstRun() {
         )
         let _ = state.settings.save()
 
-        let image = UIImage(named: "1-leg-raise")
-
         func saveImage(image: UIImage, path: URL ) {
             let pngImageData = UIImagePNGRepresentation(image)
             try? pngImageData!.write(to: path)
@@ -74,20 +72,21 @@ func firstRun() {
                     image: "running-3.png",
                     description: "",
                     startSpeech: "Run In Place 2 minutes",
-                    thirtySecondsLeftSpeech: "30 seconds more",
+                    thirtySecondsLeftSpeech: "30 seconds left",
                     tenSecondsLeftSpeech: "",
                     fiveSecondsLeftSpeech: "",
                     endSpeech: "Exercise completed"),
-            (id: 4,
-                    name: "Surya Namaskar",
-                    duration: 120,
-                    image: "surya-namaskar-4.png",
-                    description: "A set of yoga asanas (postures) that provide a good cardiovascular workout. Literally translated to sun salutation, these postures are a good way to keep the body in shape and the mind calm and healthy.",
-                    startSpeech: "Surya Namaskar 1 minute",
-                    thirtySecondsLeftSpeech: "30 seconds left",
-                    tenSecondsLeftSpeech: "10 seconds left",
-                    fiveSecondsLeftSpeech: "5 seconds left",
-                    endSpeech: "Exercise completed")
+
+//            (id: 4,
+//                    name: "Surya Namaskar",
+//                    duration: 120,
+//                    image: "surya-namaskar-4.png",
+//                    description: "A set of yoga asanas (postures) that provide a good cardiovascular workout. Literally translated to sun salutation, these postures are a good way to keep the body in shape and the mind calm and healthy.",
+//                    startSpeech: "Surya Namaskar 1 minute",
+//                    thirtySecondsLeftSpeech: "30 seconds left",
+//                    tenSecondsLeftSpeech: "10 seconds left",
+//                    fiveSecondsLeftSpeech: "5 seconds left",
+//                    endSpeech: "Exercise completed")
             // Add Headstanding someday to show speech usage.
         ]
 
