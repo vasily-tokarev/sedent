@@ -14,7 +14,7 @@ enum WorkoutErrors: Error {
     case timerNotSet
 }
 
-let notifications: Notifications = Notifications()
+var notifications: Notifications = Notifications()
 
 class State: Codable {
     var settings: [Settings] = DataManager().saved()
@@ -30,13 +30,13 @@ func firstRun() {
         state.settings = []
         state.settings.append(
                 Settings (
-                        notificationInterval: 0.1,
+                        notificationInterval: 40,
                         workoutDuration: 2.0,
                         notificationText: "It is time to move!",
                         autostart: false,
                         dateNotificationCreated: Date(),
                         notificationSwitchIsOn: false,
-                        workoutCompleteSpeech: "Workout complete"
+                        workoutCompleteSpeech: "Workout completed"
                 )
         )
         let _ = state.settings.save()
@@ -52,42 +52,43 @@ func firstRun() {
             (id: 1, name: "Leg Raise",
                     duration: 60,
                     image: "leg-raise-1.png",
-                    description: "Leg Raise description",
-                    startSpeech: "leg start speech",
-                    thirtySecondsLeftSpeech: "leg 30",
-                    tenSecondsLeftSpeech: "leg 10",
-                    fiveSecondsLeftSpeech: "leg 5",
-                    endSpeech: "leg end"),
+                    description: "Leg raises are often used to strengthen the rectus abdominis muscle and the internal and external oblique muscles.",
+                    startSpeech: "Leg Raise 1 minute",
+                    thirtySecondsLeftSpeech: "30 seconds left",
+                    tenSecondsLeftSpeech: "10 seconds left",
+                    fiveSecondsLeftSpeech: "5 seconds left",
+                    endSpeech: "Exercise completed"),
             (id: 2,
                     name: "Plank",
                     duration: 60,
                     image: "plank-2.png",
-                    description: "Plank description",
-                    startSpeech: "plank start speech",
-                    thirtySecondsLeftSpeech: "plank 30",
-                    tenSecondsLeftSpeech: "plank 10",
-                    fiveSecondsLeftSpeech: "plank 5",
-                    endSpeech: "plank end"),
+                    description: "The plank (also called a front hold, hover, or abdominal bridge) is an isometric core strength exercise that involves maintaining a position similar to a push-up for the maximum possible time.",
+                    startSpeech: "Plank 1 minute",
+                    thirtySecondsLeftSpeech: "30 seconds left",
+                    tenSecondsLeftSpeech: "10 seconds left, hold it!",
+                    fiveSecondsLeftSpeech: "Almost done!",
+                    endSpeech: "Exercise completed"),
             (id: 3,
                     name: "Run In Place",
-                    duration: 60,
+                    duration: 120,
                     image: "running-3.png",
-                    description: "Run description",
-                    thirtySecondsLeftSpeech: "run 30",
-                    tenSecondsLeftSpeech: "run 10",
-                    fiveSecondsLeftSpeech: "run 5",
-                    endSpeech: "run end",
-                    startSpeech: "running start speech"),
+                    description: "",
+                    startSpeech: "Run In Place 2 minutes",
+                    thirtySecondsLeftSpeech: "30 seconds more",
+                    tenSecondsLeftSpeech: "",
+                    fiveSecondsLeftSpeech: "",
+                    endSpeech: "Exercise completed"),
             (id: 4,
                     name: "Surya Namaskar",
-                    duration: 60,
+                    duration: 120,
                     image: "surya-namaskar-4.png",
-                    description: "A set of 12 yoga asanas (postures) that provide a good cardiovascular workout. Literally translated to sun salutation, these postures are a good way to keep the body in shape and the mind calm and healthy.",
-                    startSpeech: "Surya start speech",
-                    thirtySecondsLeftSpeech: "surya 30",
-                    tenSecondsLeftSpeech: "surya 10",
-                    fiveSecondsLeftSpeech: "surya 5",
-                    endSpeech: "surya end") // duration
+                    description: "A set of yoga asanas (postures) that provide a good cardiovascular workout. Literally translated to sun salutation, these postures are a good way to keep the body in shape and the mind calm and healthy.",
+                    startSpeech: "Surya Namaskar 1 minute",
+                    thirtySecondsLeftSpeech: "30 seconds left",
+                    tenSecondsLeftSpeech: "10 seconds left",
+                    fiveSecondsLeftSpeech: "5 seconds left",
+                    endSpeech: "Exercise completed")
+            // Add Headstanding someday to show speech usage.
         ]
 
         exercises.forEach {
@@ -111,10 +112,14 @@ func firstRun() {
                                         end: $0.endSpeech),
                                 description: $0.description)
                 )
+                state.enabledExercises.append(EnabledExercise(workoutId: nil, exerciseId: $0.id, name: $0.name))
             }
         }
 
         state.exercises.save()
+        state.enabledExercises.saveAndArrangeWorkouts()
+
+//        state.exercises.save()
         // EnabledExercise + Re-arrange
 
 //        state.exercises.append(Exercise(id: 1, name: "Leg Raise", duration: 60, speech: Exercise.Speech(start: "start"), description: "hello"))
@@ -246,43 +251,45 @@ class Coach {
             }
         }
 
-        DispatchQueue.global(qos: .userInitiated).async {
-            switch secondsLeft {
-            case 30:
-                if self.currentExercise.thirtySecondsLeftSpoken {
-                    break
-                } else {
-                    self.speaker(say: self.currentExercise.exercise.speech.thirtySecondsLeft)
-                    self.currentExercise.thirtySecondsLeftSpoken = true
-                }
-            case 10:
-                if self.currentExercise.tenSecondsLeftSpoken {
-                    break
-                } else {
-                    self.speaker(say: self.currentExercise.exercise.speech.tenSecondsLeft)
-                    self.currentExercise.tenSecondsLeftSpoken = true
-                }
-            case 5:
-                if self.currentExercise.fiveSecondsLeftSpoken {
-                    break
-                } else {
-                    self.speaker(say: self.currentExercise.exercise.speech.fiveSecondsLeft)
-                    self.currentExercise.fiveSecondsLeftSpoken = true
-                }
-            case 0:
-                if self.currentExercise.endSpoken {
-                    break
-                } else {
-                    self.speaker(say: self.currentExercise.exercise.speech.end)
-                    self.currentExercise.endSpoken = true
-                }
+        if minutesLeft == 0 {
+            DispatchQueue.global(qos: .userInitiated).async {
+                switch secondsLeft {
+                case 30:
+                    if self.currentExercise.thirtySecondsLeftSpoken {
+                        break
+                    } else {
+                        self.speaker(say: self.currentExercise.exercise.speech.thirtySecondsLeft)
+                        self.currentExercise.thirtySecondsLeftSpoken = true
+                    }
+                case 10:
+                    if self.currentExercise.tenSecondsLeftSpoken {
+                        break
+                    } else {
+                        self.speaker(say: self.currentExercise.exercise.speech.tenSecondsLeft)
+                        self.currentExercise.tenSecondsLeftSpoken = true
+                    }
+                case 5:
+                    if self.currentExercise.fiveSecondsLeftSpoken {
+                        break
+                    } else {
+                        self.speaker(say: self.currentExercise.exercise.speech.fiveSecondsLeft)
+                        self.currentExercise.fiveSecondsLeftSpoken = true
+                    }
+                case 0:
+                    if self.currentExercise.endSpoken {
+                        break
+                    } else {
+                        self.speaker(say: self.currentExercise.exercise.speech.end)
+                        self.currentExercise.endSpoken = true
+                    }
 
-                if self.secondsSinceExerciseStarted >= self.currentExerciseDuration && self.currentExercise.exercise == self.workout.exercises.last {
-                    // TODO: Spoken?
-                    self.speaker(say: state.settings[0].workoutCompleteSpeech)
+                    if self.secondsSinceExerciseStarted >= self.currentExerciseDuration && self.currentExercise.exercise == self.workout.exercises.last {
+                        // TODO: Spoken?
+                        self.speaker(say: state.settings[0].workoutCompleteSpeech)
+                    }
+                default:
+                    break
                 }
-            default:
-                break
             }
         }
 

@@ -94,6 +94,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7739E0701FB271BB004EA563 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		775729DB1F83737500D3F83F = {
 			isa = PBXGroup;
 			children = (
@@ -101,6 +108,7 @@
 				775729FE1F83737600D3F83F /* SedentTests */,
 				77572A091F83737600D3F83F /* SedentUITests */,
 				775729E51F83737500D3F83F /* Products */,
+				7739E0701FB271BB004EA563 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -224,6 +232,11 @@
 					775729E31F83737500D3F83F = {
 						CreatedOnToolsVersion = 9.0;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.InAppPurchase = {
+								enabled = 0;
+							};
+						};
 					};
 					775729FA1F83737600D3F83F = {
 						CreatedOnToolsVersion = 9.0;

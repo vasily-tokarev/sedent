@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SettingsTableViewController: UITableViewController {
+class SettingsTableViewController: UITableViewController, UITextFieldDelegate {
     var settings: Settings = state.settings[0]
 
     @IBOutlet weak var notificationIntervalStepper: UIStepper!
@@ -39,6 +39,15 @@ class SettingsTableViewController: UITableViewController {
 
         state.settings[0] = settings
         let _ = state.settings.save()
+
+        state.enabledExercises.forEach { enabledExercise in
+            if enabledExercise.duration > state.settings[0].workoutDurationInSeconds {
+                state.enabledExercises = state.enabledExercises.filter { $0.id != enabledExercise.id}
+            }
+        }
+
+        notifications = Notifications()
+
         state.workouts.refresh()
     }
     
@@ -72,8 +81,17 @@ class SettingsTableViewController: UITableViewController {
 //        nav?.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.white]
 //    }
 
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
+
+
+        notificationTextField.delegate = self
+        workoutCompleteSpeech.delegate = self
 
         notificationIntervalStepper.value = state.settings[0].notificationInterval
 

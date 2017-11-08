@@ -32,6 +32,7 @@ class Notifications {
     }
 
     func createNotification(dateNotificationCreated: Date? = nil) {
+        setupNotifications()
         if dateNotificationCreated != nil {
             self.dateNotificationCreated = dateNotificationCreated
         } else {
@@ -59,6 +60,6 @@ class Notifications {
     }
 
     init() {
-        setupNotifications()
+//        setupNotifications()
     }
 }
