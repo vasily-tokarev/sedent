@@ -76,24 +76,10 @@ func firstRun() {
                     tenSecondsLeftSpeech: "",
                     fiveSecondsLeftSpeech: "",
                     endSpeech: "Exercise completed"),
-
-//            (id: 4,
-//                    name: "Surya Namaskar",
-//                    duration: 120,
-//                    image: "surya-namaskar-4.png",
-//                    description: "A set of yoga asanas (postures) that provide a good cardiovascular workout. Literally translated to sun salutation, these postures are a good way to keep the body in shape and the mind calm and healthy.",
-//                    startSpeech: "Surya Namaskar 1 minute",
-//                    thirtySecondsLeftSpeech: "30 seconds left",
-//                    tenSecondsLeftSpeech: "10 seconds left",
-//                    fiveSecondsLeftSpeech: "5 seconds left",
-//                    endSpeech: "Exercise completed")
-            // Add Headstanding someday to show speech usage.
         ]
 
         exercises.forEach {
             if let image = UIImage(named: $0.image),
-//           let docDir = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true) {
-            // TODO: `create: true` or `false`? Make it global? Appropriate?
                let docDir = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false) {
 
                 let imageURL = docDir.appendingPathComponent("\($0.name)-\($0.id)-0.png")
@@ -118,15 +104,6 @@ func firstRun() {
         state.exercises.save()
         state.enabledExercises.saveAndArrangeWorkouts()
 
-//        state.exercises.save()
-        // EnabledExercise + Re-arrange
-
-//        state.exercises.append(Exercise(id: 1, name: "Leg Raise", duration: 60, speech: Exercise.Speech(start: "start"), description: "hello"))
-
-//        init(start: String = "", thirtySecondsLeft: String = "", tenSecondsLeft: String = "", fiveSecondsLeft: String = "", end: String = "") {
-//        init(id: Int? = nil, name: String = "Exercise", duration: Int = 60, speech: Speech = Speech(), description: String = "") {
-
-
         let _ = state.settings.save()
     }
 }
@@ -147,7 +124,6 @@ class Settings: Codable {
     var workoutDuration: Double
     var autostart: Bool
     var notificationText: String
-//    let timerOffAt: Date = Date() // Do I need it really?
     var workoutCompleteSpeech: String
     var notificationIntervalInSeconds: Double {
         return self.notificationInterval * 60
@@ -188,18 +164,14 @@ class Coach {
     var exercises: [Exercise] { return workout.exercises }
     var currentExercise: CurrentExercise
     var currentEnabledExercise: EnabledExercise
-//    var currentExerciseIndex: Int { return workout.exercises.index(of: currentExercise.exercise)! }
-//    var currentEnabledExerciseIndex: Int { return workout.enabledExercises.index(of: currentEnabledExercise)! }
     var currentExerciseIndex: Int
     var currentEnabledExerciseIndex: Int
     var currentExerciseDuration: Int { return currentExercise.exercise.duration }
-//    var currentExerciseDuration: Int { return 3 }
     var secondsSinceExerciseStarted: Int {
         return Int(Date().timeIntervalSince(exerciseStarted!))
     }
     var workout: Workout
     var totalDuration: Int?
-//    var durationLeft: Int?
 
     var timer: Timer? = nil {
         willSet {
@@ -217,9 +189,6 @@ class Coach {
     }
 
     func stop() throws {
-        // https://stackoverflow.com/questions/44633729/stop-a-dispatchqueue-that-is-running-on-the-main-thread
-//        print("stopping workout")
-
         guard let timer = timer else {
             print("Workout: timer is not set")
             throw WorkoutErrors.timerNotSet
@@ -291,7 +260,6 @@ class Coach {
                         self.currentExercise.endSpoken = true
                     }
 
-//                    if self.secondsSinceExerciseStarted >= self.currentExerciseDuration && self.currentExercise.exercise == self.workout.exercises.last {
                     if self.secondsSinceExerciseStarted >= self.currentExerciseDuration && self.currentEnabledExercise == self.workout.enabledExercises.last {
                         // TODO: Spoken?
                         self.speaker(say: state.settings[0].workoutCompleteSpeech)
@@ -302,24 +270,23 @@ class Coach {
             }
         }
 
-        if self.secondsSinceExerciseStarted > self.currentExerciseDuration {
-//            if self.currentExercise.exercise == self.workout.exercises.last {
-            if self.currentEnabledExercise == self.workout.enabledExercises.last {
-                self.timer!.invalidate()
-                self.coachViewDelegate?.performSegueToReturnBack()
+        if secondsSinceExerciseStarted > currentExerciseDuration {
+            if currentEnabledExercise == workout.enabledExercises.last {
+                timer!.invalidate()
+                coachViewDelegate?.performSegueToReturnBack()
             } else {
-                self.currentExercise = CurrentExercise(exercise: self.workout.exercises[self.currentExerciseIndex + 1])
-                self.currentEnabledExercise = self.workout.enabledExercises[self.currentEnabledExerciseIndex + 1]
+                currentExercise = CurrentExercise(exercise: self.workout.exercises[self.currentExerciseIndex + 1])
+                currentEnabledExercise = self.workout.enabledExercises[self.currentEnabledExerciseIndex + 1]
 
-                self.currentExerciseIndex += 1
-                self.currentEnabledExerciseIndex += 1
+                currentExerciseIndex += 1
+                currentEnabledExerciseIndex += 1
 
-                self.coachViewDelegate!.exerciseChanged()
-                self.exerciseStarted = Date()
+                coachViewDelegate!.exerciseChanged()
+                exerciseStarted = Date()
 
-                self.timer!.invalidate()
-                self.startTimer()
-                self.speaker(say: self.currentExercise.exercise.speech.start)
+                timer!.invalidate()
+                startTimer()
+                speaker(say: currentExercise.exercise.speech.start)
             }
         }
     }
@@ -376,7 +343,7 @@ class Exercise: Codable, Equatable, HasId {
 }
 
 struct DataManager<Element> {
-    // Constraint types with a protocol?
+    // TODO: Constraint types.
     let propertyListEncoder = PropertyListEncoder()
     let propertyListDecoder = PropertyListDecoder()
 
